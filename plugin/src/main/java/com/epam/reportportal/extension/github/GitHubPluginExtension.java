@@ -30,9 +30,9 @@ import org.springframework.context.support.AbstractApplicationContext;
  * @author Andrei Piankouski
  */
 @Extension
-public class GitlabPluginExtension implements ReportPortalExtensionPoint, DisposableBean {
+public class GitHubPluginExtension implements ReportPortalExtensionPoint, DisposableBean {
 
-    private static final String PLUGIN_ID = "Github";
+    private static final String PLUGIN_ID = "GitHub";
     public static final String BINARY_DATA_PROPERTIES_FILE_ID = "binary-data.properties";
 
     private Supplier<Map<String, PluginCommand>> pluginCommandMapping;
@@ -58,12 +58,7 @@ public class GitlabPluginExtension implements ReportPortalExtensionPoint, Dispos
     @Autowired
     private ApplicationContext applicationContext;
 
-    @PostConstruct
-    private void init() {
-        this.pluginCommandMapping = new MemoizingSupplier<>(this::getCommands);
-    }
-
-    public GitlabPluginExtension(Map<String, Object> initParams) {
+    public GitHubPluginExtension(Map<String, Object> initParams) {
         resourcesDir = IntegrationTypeProperties.RESOURCES_DIRECTORY.getValue(initParams).map(String::valueOf).orElse("");
 
         pluginLoadedListener = new MemoizingSupplier<>(() -> new PluginEventListener(PLUGIN_ID,
@@ -73,6 +68,7 @@ public class GitlabPluginExtension implements ReportPortalExtensionPoint, Dispos
 
     @PostConstruct
     public void createIntegration() {
+        this.pluginCommandMapping = new MemoizingSupplier<>(this::getCommands);
         initListeners();
     }
 

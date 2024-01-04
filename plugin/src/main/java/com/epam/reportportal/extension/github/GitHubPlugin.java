@@ -6,7 +6,7 @@ import org.pf4j.PluginWrapper;
 /**
  * @author Andrei Piankouski
  */
-public class GithubPlugin extends Plugin {
+public class GitHubPlugin extends Plugin {
     /**
      * Constructor to be used by plugin manager for plugin instantiation.
      * Your plugins have to provide constructor with this exact signature to
@@ -14,7 +14,7 @@ public class GithubPlugin extends Plugin {
      *
      * @param wrapper - A wrapper over plugin instance.
      */
-    public GithubPlugin(PluginWrapper wrapper) {
+    public GitHubPlugin(PluginWrapper wrapper) {
         super(wrapper);
     }
 }

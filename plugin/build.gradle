@@ -35,7 +35,6 @@ repositories {
     } else {
         maven { url 'https://jitpack.io' }
     }
-    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -105,7 +104,7 @@ jar {
                 "Plugin-Id": "${pluginId}",
                 "Plugin-Version": "${project.version}",
                 "Plugin-Provider": "Report Portal",
-                "Plugin-Class": "com.epam.reportportal.extension.template.GithubPlugin",
+                "Plugin-Class": "com.epam.reportportal.extension.template.GitHubPlugin",
                 "Plugin-Service": "api"
         )
     }

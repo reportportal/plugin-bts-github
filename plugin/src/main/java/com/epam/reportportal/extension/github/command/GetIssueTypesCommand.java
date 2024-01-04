@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * @author Andrei Piankouski
- */
 public class GetIssueTypesCommand extends ProjectMemberCommand<List<String>> {
 
     public GetIssueTypesCommand(ProjectRepository projectRepository) {
