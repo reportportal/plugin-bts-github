@@ -1,4 +1,4 @@
-# Github plugin for Epam Report Portal
+# Template plugin for Epam Report Portal
 
 ## UI
 

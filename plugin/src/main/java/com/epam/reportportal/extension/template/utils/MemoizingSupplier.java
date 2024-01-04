@@ -1,4 +1,4 @@
-package com.epam.reportportal.extension.github.utils;
+package com.epam.reportportal.extension.template.utils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;

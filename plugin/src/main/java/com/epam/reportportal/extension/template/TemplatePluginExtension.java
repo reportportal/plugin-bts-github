@@ -1,41 +1,41 @@
-package com.epam.reportportal.extension.github;
+package com.epam.reportportal.extension.template;
 
 import com.epam.reportportal.extension.CommonPluginCommand;
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
 import com.epam.reportportal.extension.common.IntegrationTypeProperties;
 import com.epam.reportportal.extension.event.PluginEvent;
-import com.epam.reportportal.extension.github.command.GetIssueTypesCommand;
-import com.epam.reportportal.extension.github.event.plugin.PluginEventHandlerFactory;
-import com.epam.reportportal.extension.github.event.plugin.PluginEventListener;
-import com.epam.reportportal.extension.github.utils.MemoizingSupplier;
+import com.epam.reportportal.extension.template.command.TemplateCommand;
+import com.epam.reportportal.extension.template.event.plugin.PluginEventHandlerFactory;
+import com.epam.reportportal.extension.template.event.plugin.PluginEventListener;
+import com.epam.reportportal.extension.template.utils.MemoizingSupplier;
 import com.epam.ta.reportportal.dao.IntegrationRepository;
 import com.epam.ta.reportportal.dao.IntegrationTypeRepository;
 import com.epam.ta.reportportal.dao.LogRepository;
-import com.epam.ta.reportportal.dao.ProjectRepository;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
-import javax.annotation.PostConstruct;
-import org.pf4j.Extension;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.pf4j.Extension;
+
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * @author Andrei Piankouski
  */
 @Extension
-public class GitlabPluginExtension implements ReportPortalExtensionPoint, DisposableBean {
+public class TemplatePluginExtension implements ReportPortalExtensionPoint, DisposableBean {
 
-    private static final String PLUGIN_ID = "Github";
+    private static final String PLUGIN_ID = "template";
     public static final String BINARY_DATA_PROPERTIES_FILE_ID = "binary-data.properties";
 
-    private Supplier<Map<String, PluginCommand>> pluginCommandMapping;
+    private final Supplier<Map<String, PluginCommand>> pluginCommandMapping = new MemoizingSupplier<>(this::getCommands);
 
     private final Supplier<Map<String, CommonPluginCommand<?>>> commonPluginCommandMapping = new MemoizingSupplier<>(this::getCommonCommands);
 
@@ -53,17 +53,9 @@ public class GitlabPluginExtension implements ReportPortalExtensionPoint, Dispos
     private LogRepository logRepository;
 
     @Autowired
-    private ProjectRepository projectRepository;
-
-    @Autowired
     private ApplicationContext applicationContext;
 
-    @PostConstruct
-    private void init() {
-        this.pluginCommandMapping = new MemoizingSupplier<>(this::getCommands);
-    }
-
-    public GitlabPluginExtension(Map<String, Object> initParams) {
+    public TemplatePluginExtension(Map<String, Object> initParams) {
         resourcesDir = IntegrationTypeProperties.RESOURCES_DIRECTORY.getValue(initParams).map(String::valueOf).orElse("");
 
         pluginLoadedListener = new MemoizingSupplier<>(() -> new PluginEventListener(PLUGIN_ID,
@@ -115,8 +107,8 @@ public class GitlabPluginExtension implements ReportPortalExtensionPoint, Dispos
 
     private Map<String, PluginCommand> getCommands() {
         HashMap<String, PluginCommand> pluginCommands = new HashMap<>();
-        var getIssueTypesCommand = new GetIssueTypesCommand(projectRepository);
-        pluginCommands.put(getIssueTypesCommand.getName(), getIssueTypesCommand);
+        TemplateCommand templatePlugin = new TemplateCommand();
+        pluginCommands.put(templatePlugin.getName(), templatePlugin);
         return pluginCommands;
     }
 
