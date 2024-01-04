@@ -1,9 +1,9 @@
-package com.epam.reportportal.extension.template.event.plugin;
+package com.epam.reportportal.extension.github.event.plugin;
 
 import com.epam.reportportal.extension.event.PluginEvent;
-import com.epam.reportportal.extension.template.event.EventHandlerFactory;
-import com.epam.reportportal.extension.template.event.handler.EventHandler;
-import com.epam.reportportal.extension.template.event.handler.plugin.PluginLoadedEventHandler;
+import com.epam.reportportal.extension.github.event.EventHandlerFactory;
+import com.epam.reportportal.extension.github.event.handler.EventHandler;
+import com.epam.reportportal.extension.github.event.handler.plugin.PluginLoadedEventHandler;
 import com.epam.ta.reportportal.dao.IntegrationRepository;
 import com.epam.ta.reportportal.dao.IntegrationTypeRepository;
 

@@ -1,8 +1,8 @@
-package com.epam.reportportal.extension.template.event.handler.plugin;
+package com.epam.reportportal.extension.github.event.handler.plugin;
 
 import com.epam.reportportal.extension.event.PluginEvent;
-import com.epam.reportportal.extension.template.TemplatePluginExtension;
-import com.epam.reportportal.extension.template.event.handler.EventHandler;
+import com.epam.reportportal.extension.github.GitlabPluginExtension;
+import com.epam.reportportal.extension.github.event.handler.EventHandler;
 import com.epam.ta.reportportal.dao.IntegrationRepository;
 import com.epam.ta.reportportal.dao.IntegrationTypeRepository;
 import com.epam.ta.reportportal.entity.integration.Integration;
@@ -67,7 +67,7 @@ public class PluginLoadedEventHandler implements EventHandler<PluginEvent> {
 		Map<String, Object> details = integrationType.getDetails().getDetails();
 		if (ofNullable(details.get(BINARY_DATA)).isEmpty()) {
 			try (InputStream propertiesStream = Files.newInputStream(Paths.get(resourcesDir,
-					TemplatePluginExtension.BINARY_DATA_PROPERTIES_FILE_ID
+					GitlabPluginExtension.BINARY_DATA_PROPERTIES_FILE_ID
 			))) {
 				Properties binaryDataProperties = new Properties();
 				binaryDataProperties.load(propertiesStream);
