@@ -32,7 +32,9 @@ public enum GitHubIssueField {
             .id("assignees")
             .fieldName("Assignees")
             .fieldType("array")
-            .description("Logins for Users to assign to this issue. NOTE: Only users with push access can set assignees for new issues. Assignees are silently dropped otherwise.")
+            .description("Logins for Users to assign to this issue. " +
+                    "NOTE: Only users with push access can set assignees for new " +
+                    "issues. Assignees are silently dropped otherwise.")
             .isRequired(false)
             .build()
     ),
@@ -40,7 +42,9 @@ public enum GitHubIssueField {
             .id("milestone")
             .fieldName("Milestone")
             .fieldType("string")
-            .description("The number of the milestone to associate this issue with. NOTE: Only users with push access can set the milestone for new issues. The milestone is silently dropped otherwise.")
+            .description("The number of the milestone to associate this issue with. " +
+                    "NOTE: Only users with push access can set the milestone for new issues. " +
+                    "The milestone is silently dropped otherwise.")
             .isRequired(false)
             .build()
     ),
@@ -48,7 +52,9 @@ public enum GitHubIssueField {
             .id("labels")
             .fieldName("Labels")
             .fieldType("array")
-            .description("Labels to associate with this issue. NOTE: Only users with push access can set labels for new issues. Labels are silently dropped otherwise.")
+            .description("Labels to associate with this issue. " +
+                    "NOTE: Only users with push access can set labels for new issues. " +
+                    "Labels are silently dropped otherwise.")
             .isRequired(false)
             .build()
     );
