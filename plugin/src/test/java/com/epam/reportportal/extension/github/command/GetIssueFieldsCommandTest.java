@@ -1,13 +1,11 @@
 package com.epam.reportportal.extension.github.command;
 
 import com.epam.ta.reportportal.ws.model.externalsystem.PostFormField;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class GetIssueFieldsCommandTest {
 
