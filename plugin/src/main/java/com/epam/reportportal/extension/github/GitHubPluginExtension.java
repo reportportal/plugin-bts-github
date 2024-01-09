@@ -5,6 +5,7 @@ import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
 import com.epam.reportportal.extension.common.IntegrationTypeProperties;
 import com.epam.reportportal.extension.event.PluginEvent;
+import com.epam.reportportal.extension.github.command.GetIssueFieldsCommand;
 import com.epam.reportportal.extension.github.command.GetIssueTypesCommand;
 import com.epam.reportportal.extension.github.event.plugin.PluginEventHandlerFactory;
 import com.epam.reportportal.extension.github.event.plugin.PluginEventListener;
@@ -13,11 +14,13 @@ import com.epam.ta.reportportal.dao.IntegrationRepository;
 import com.epam.ta.reportportal.dao.IntegrationTypeRepository;
 import com.epam.ta.reportportal.dao.LogRepository;
 import com.epam.ta.reportportal.dao.ProjectRepository;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 import javax.annotation.PostConstruct;
+
 import org.pf4j.Extension;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,7 +115,9 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
     private Map<String, PluginCommand> getCommands() {
         HashMap<String, PluginCommand> pluginCommands = new HashMap<>();
         var getIssueTypesCommand = new GetIssueTypesCommand(projectRepository);
+        var getIssueFieldsCommand = new GetIssueFieldsCommand(projectRepository);
         pluginCommands.put(getIssueTypesCommand.getName(), getIssueTypesCommand);
+        pluginCommands.put(getIssueFieldsCommand.getName(), getIssueFieldsCommand);
         return pluginCommands;
     }
 
