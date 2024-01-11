@@ -3,6 +3,7 @@ package com.epam.reportportal.extension.github.command;
 import com.epam.reportportal.extension.ProjectMemberCommand;
 import com.epam.ta.reportportal.dao.ProjectRepository;
 import com.epam.ta.reportportal.entity.integration.Integration;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

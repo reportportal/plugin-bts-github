@@ -7,6 +7,7 @@ import com.epam.reportportal.extension.common.IntegrationTypeProperties;
 import com.epam.reportportal.extension.event.PluginEvent;
 import com.epam.reportportal.extension.github.command.GetIssueFieldsCommand;
 import com.epam.reportportal.extension.github.command.GetIssueTypesCommand;
+import com.epam.reportportal.extension.github.command.RetrieveCreateParamsCommand;
 import com.epam.reportportal.extension.github.event.plugin.PluginEventHandlerFactory;
 import com.epam.reportportal.extension.github.event.plugin.PluginEventListener;
 import com.epam.reportportal.extension.github.utils.MemoizingSupplier;
@@ -14,13 +15,7 @@ import com.epam.ta.reportportal.dao.IntegrationRepository;
 import com.epam.ta.reportportal.dao.IntegrationTypeRepository;
 import com.epam.ta.reportportal.dao.LogRepository;
 import com.epam.ta.reportportal.dao.ProjectRepository;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
-import javax.annotation.PostConstruct;
-
+import org.jasypt.util.text.BasicTextEncryptor;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +23,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.support.AbstractApplicationContext;
+
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * @author Andrei Piankouski
@@ -40,7 +41,7 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
 
     private Supplier<Map<String, PluginCommand>> pluginCommandMapping;
 
-    private final Supplier<Map<String, CommonPluginCommand<?>>> commonPluginCommandMapping = new MemoizingSupplier<>(this::getCommonCommands);
+    private Supplier<Map<String, CommonPluginCommand<?>>> commonPluginCommandMapping;
 
     private final String resourcesDir;
 
@@ -61,6 +62,9 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
     @Autowired
     private ApplicationContext applicationContext;
 
+    @Autowired
+    private BasicTextEncryptor textEncryptor;
+
     public GitHubPluginExtension(Map<String, Object> initParams) {
         resourcesDir = IntegrationTypeProperties.RESOURCES_DIRECTORY.getValue(initParams).map(String::valueOf).orElse("");
 
@@ -72,6 +76,7 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
     @PostConstruct
     public void createIntegration() {
         this.pluginCommandMapping = new MemoizingSupplier<>(this::getCommands);
+        this.commonPluginCommandMapping = new MemoizingSupplier<>(this::getCommonCommands);
         initListeners();
     }
 
@@ -113,16 +118,18 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
     }
 
     private Map<String, PluginCommand> getCommands() {
-        HashMap<String, PluginCommand> pluginCommands = new HashMap<>();
         var getIssueTypesCommand = new GetIssueTypesCommand(projectRepository);
         var getIssueFieldsCommand = new GetIssueFieldsCommand(projectRepository);
-        pluginCommands.put(getIssueTypesCommand.getName(), getIssueTypesCommand);
-        pluginCommands.put(getIssueFieldsCommand.getName(), getIssueFieldsCommand);
-        return pluginCommands;
+        return Map.of(
+                getIssueTypesCommand.getName(), getIssueTypesCommand,
+                getIssueFieldsCommand.getName(), getIssueFieldsCommand
+        );
     }
 
     private Map<String, CommonPluginCommand<?>> getCommonCommands() {
-        HashMap<String, CommonPluginCommand<?>> pluginCommands = new HashMap<>();
-        return pluginCommands;
+        var retrieveCreateCommand = new RetrieveCreateParamsCommand(textEncryptor);
+        return Map.of(
+                retrieveCreateCommand.getName(), retrieveCreateCommand
+        );
     }
 }
