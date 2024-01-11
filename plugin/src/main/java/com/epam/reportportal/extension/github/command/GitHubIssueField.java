@@ -64,4 +64,8 @@ public enum GitHubIssueField {
             .map(GitHubIssueField::getFieldMeta)
             .collect(Collectors.toList());
     private final PostFormField fieldMeta;
+
+    public String getId() {
+        return fieldMeta.getId();
+    }
 }

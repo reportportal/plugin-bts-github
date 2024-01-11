@@ -1,12 +1,14 @@
 import com.github.spotbugs.SpotBugsTask
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
     id "io.spring.dependency-management" version "1.0.9.RELEASE"
     id 'java'
     id 'jacoco'
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
     id "com.github.spotbugs" version "3.0.0"
     id "com.github.node-gradle.node" version "3.5.1"
+    id "org.openapi.generator" version "6.6.0"
 }
 
 apply from: 'project-properties.gradle'
@@ -38,18 +40,16 @@ dependencyManagement {
     }
 }
 
-dependencies {
-    if (releaseMode) {
-        implementation 'com.epam.reportportal:plugin-api'
-        annotationProcessor 'com.epam.reportportal:plugin-api'
-    } else {
-        implementation "com.github.reportportal:plugin-api:$pluginApiVersion"
-        annotationProcessor "com.github.reportportal:plugin-api:$pluginApiVersion"
-    }
-    implementation "org.apache.commons:commons-lang3:$apacheCommonsLangVersion"
-    implementation "org.apache.commons:commons-collections4:$apacheCommonsCollectionsVersion"
+sourceSets.main.java.srcDirs += "$buildDir/generated/src/main/java"
 
-    implementation "org.jasypt:jasypt:$jasyptVersion"
+dependencies {
+    implementation 'com.epam.reportportal:plugin-api'
+    annotationProcessor 'com.epam.reportportal:plugin-api'
+
+    implementation "org.apache.commons:commons-lang3"
+    shadow "org.openapitools:jackson-databind-nullable:$openApiNullableVersion"
+    shadow "org.apache.commons:commons-collections4:$apacheCommonsCollectionsVersion"
+
     compileOnly "org.projectlombok:lombok:$lombokVersion"
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
 
@@ -63,6 +63,7 @@ dependencies {
 spotbugs {
     sourceSets = [sourceSets.main]
     reportLevel = "high"
+    excludeFilter = file('spotbugsFilter.xml')
 }
 tasks.withType(SpotBugsTask) {
     reports {
@@ -101,6 +102,7 @@ sourceSets {
 jar {
     from("src/main/resources") {
         into("/resources")
+        exclude "github-api-spec.yaml"
     }
     from("ui/build") {
         into("/resources")
@@ -120,11 +122,12 @@ jar {
 shadowJar {
     from("src/main/resources") {
         into("/resources")
+        exclude "github-api-spec.yaml"
     }
     from("ui/build") {
         into("/resources")
     }
-    configurations = [project.configurations.compile]
+    configurations = [project.configurations.shadow]
     zip64 true
     dependencies {
         exclude(dependency('com.github.reportportal:'))
@@ -135,7 +138,38 @@ shadowJar {
         exclude(dependency('org.springframework.boot:'))
         exclude(dependency('ch.qos.logback:'))
         exclude(dependency('org.slf4j:'))
+        exclude(dependency('com.fasterxml.jackson.core:'))
+        exclude(dependency('org.apache.commons:commons-lang3:'))
     }
+
+    relocate "org.apache.commons.collections4", "shadow.org.apache.commons.collections4"
+    relocate "org.openapitools", "shadow.org.openapitools"
+}
+
+task openApiGenerateClient(type: GenerateTask) {
+    generatorName = "java"
+    generateApiDocumentation = false
+    inputSpec = "$rootDir/plugin/src/main/resources/github-api-spec.yaml"
+    ignoreFileOverride = "$rootDir/plugin/.openapi-generator-ignore"
+    outputDir = "$buildDir/generated"
+    modelNameSuffix = "Dto"
+    configOptions = [
+            library                       : "resttemplate",
+            dateLibrary                   : "java8",
+            annotationLibrary             : "none",
+            openApiNullable               : "true",
+            additionalModelTypeAnnotations: """
+                @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+            """
+    ]
+    globalProperties = [
+            apiDocs   : "false",
+            modelDocs : "false",
+            apiTests  : "false",
+            modelTests: "false"
+    ]
+    apiPackage = "com.epam.reportportal.extension.github.generated.api"
+    modelPackage = "com.epam.reportportal.extension.github.generated.dto"
 }
 
 task plugin(type: Jar) {
@@ -159,4 +193,4 @@ task assemblePlugins(type: Copy) {
 }
 
 compileJava.dependsOn npm_run_build
-
+compileJava.dependsOn openApiGenerateClient

@@ -1,0 +1,12 @@
+# OpenAPI Generator Ignore
+# The patterns follow closely to .gitignore or .dockerignore.
+
+**/*git*
+**/*gradle*
+**/*.yaml
+**/*.yml
+**/*.sh
+**/*.md
+**/*.xml
+**/*.sbt
+**/.openapi-generator-ignore

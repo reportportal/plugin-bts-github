@@ -8,14 +8,20 @@ import com.epam.reportportal.extension.common.IntegrationTypeProperties;
 import com.epam.reportportal.extension.event.PluginEvent;
 import com.epam.reportportal.extension.github.command.GetIssueFieldsCommand;
 import com.epam.reportportal.extension.github.command.GetIssueTypesCommand;
+import com.epam.reportportal.extension.github.command.PostTicketCommand;
 import com.epam.reportportal.extension.github.command.RetrieveCreateParamsCommand;
 import com.epam.reportportal.extension.github.event.plugin.PluginEventHandlerFactory;
 import com.epam.reportportal.extension.github.event.plugin.PluginEventListener;
+import com.epam.reportportal.extension.github.generated.api.IssuesApi;
 import com.epam.reportportal.extension.github.info.impl.PropertiesFilePluginInfoProvider;
+import com.epam.reportportal.extension.github.provider.mapper.IssuesMapper;
+import com.epam.reportportal.extension.github.provider.rest.ApiClientCustomized;
 import com.epam.reportportal.extension.github.utils.MemoizingSupplier;
+import com.epam.reportportal.extension.util.RequestEntityConverter;
 import com.epam.ta.reportportal.dao.IntegrationRepository;
 import com.epam.ta.reportportal.dao.IntegrationTypeRepository;
 import com.epam.ta.reportportal.dao.ProjectRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.DisposableBean;
@@ -40,8 +46,15 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
     private static final String PLUGIN_ID = "GitHub";
     private static final String DOCUMENTATION_LINK_FIELD = "documentationLink";
     private static final String DOCUMENTATION_LINK = "https://reportportal.io/docs/plugins/GitHubBTS";
+
     private final String resourcesDir;
+    private final IssuesApi issuesApi;
+    private final IssuesMapper issuesMapper;
     private final Supplier<ApplicationListener<PluginEvent>> pluginLoadedListenerSupplier;
+    private final Supplier<Map<String, PluginCommand<?>>> pluginCommandMapping;
+    private final Supplier<Map<String, CommonPluginCommand<?>>> commonPluginCommandMapping;
+    private final Supplier<RequestEntityConverter> requestEntityConverter;
+
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
@@ -50,23 +63,28 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
     private IntegrationRepository integrationRepository;
     @Autowired
     private ProjectRepository projectRepository;
-    private final Supplier<Map<String, PluginCommand<?>>> pluginCommandMapping = new MemoizingSupplier<>(
-            this::getCommands);
     @Autowired
     private BasicTextEncryptor textEncryptor;
-    private final Supplier<Map<String, CommonPluginCommand<?>>> commonPluginCommandMapping = new MemoizingSupplier<>(
-            this::getCommonCommands);
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     public GitHubPluginExtension(Map<String, Object> initParams) {
-        resourcesDir = IntegrationTypeProperties.RESOURCES_DIRECTORY.getValue(initParams)
+        this.resourcesDir = IntegrationTypeProperties.RESOURCES_DIRECTORY.getValue(initParams)
                 .map(String::valueOf).orElse("");
 
-        pluginLoadedListenerSupplier = new MemoizingSupplier<>(
+        this.pluginLoadedListenerSupplier = new MemoizingSupplier<>(
                 () -> new PluginEventListener(PLUGIN_ID, new PluginEventHandlerFactory(
                         integrationTypeRepository,
                         integrationRepository,
                         new PropertiesFilePluginInfoProvider(resourcesDir, BINARY_DATA_PROPERTIES_FILE_ID)
                 )));
+        this.requestEntityConverter = new MemoizingSupplier<>(() -> new RequestEntityConverter(objectMapper));
+        this.pluginCommandMapping = new MemoizingSupplier<>(this::getCommands);
+        this.commonPluginCommandMapping = new MemoizingSupplier<>(this::getCommonCommands);
+
+        this.issuesApi = new IssuesApi(new ApiClientCustomized());
+        this.issuesMapper = new IssuesMapper();
     }
 
     @PostConstruct
@@ -122,9 +140,16 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
     private Map<String, PluginCommand<?>> getCommands() {
         var getIssueTypesCommand = new GetIssueTypesCommand(projectRepository);
         var getIssueFieldsCommand = new GetIssueFieldsCommand(projectRepository);
+        var postTicketCommand = new PostTicketCommand(
+                projectRepository,
+                requestEntityConverter.get(),
+                textEncryptor,
+                issuesApi,
+                issuesMapper);
         return Map.of(
                 getIssueTypesCommand.getName(), getIssueTypesCommand,
-                getIssueFieldsCommand.getName(), getIssueFieldsCommand
+                getIssueFieldsCommand.getName(), getIssueFieldsCommand,
+                postTicketCommand.getName(), postTicketCommand
         );
     }
 
