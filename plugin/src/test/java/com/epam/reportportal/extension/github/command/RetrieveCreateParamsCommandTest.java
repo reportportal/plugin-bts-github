@@ -23,9 +23,9 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RetrieveCreateParamsCommandTest {
-    public static final String PROJECT = "project";
-    public static final String API_TOKEN = "apiToken";
-    public static final String URL = "url";
+    private static final String PROJECT = "project";
+    private static final String API_TOKEN = "apiToken";
+    private static final String URL = "url";
     @Mock
     private BasicTextEncryptor encryptor;
     @InjectMocks
@@ -61,7 +61,7 @@ class RetrieveCreateParamsCommandTest {
     @ParameterizedTest
     @MethodSource("missingParamsSource")
     void executeCommand_shouldThrowError_whenNoParamProvided(Map<String, Object> params,
-                                                                   String expectedErrorMsg) {
+                                                             String expectedErrorMsg) {
         assertThatThrownBy(() -> command.executeCommand(params))
                 .isExactlyInstanceOf(ReportPortalException.class)
                 .hasMessageContaining(expectedErrorMsg);
@@ -106,5 +106,13 @@ class RetrieveCreateParamsCommandTest {
                         API_TOKEN, blankString
                 ), tokenNotSpecified)
         );
+    }
+
+    @Test
+    void executeCommand_shouldThrowError_whenNoParametersProvided() {
+        assertThatThrownBy(() -> command.executeCommand(Map.of()))
+                .isExactlyInstanceOf(ReportPortalException.class)
+                .hasMessage("Error in handled Request. Please, check specified parameters: " +
+                        "'No integration params provided'");
     }
 }
