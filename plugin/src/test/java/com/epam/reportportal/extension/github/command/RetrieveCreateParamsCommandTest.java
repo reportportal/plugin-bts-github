@@ -60,7 +60,7 @@ class RetrieveCreateParamsCommandTest {
 
     @ParameterizedTest
     @MethodSource("missingParamsSource")
-    void executeCommand_shouldReturnThrowError_whenNoParamProvided(Map<String, Object> params,
+    void executeCommand_shouldThrowError_whenNoParamProvided(Map<String, Object> params,
                                                                    String expectedErrorMsg) {
         assertThatThrownBy(() -> command.executeCommand(params))
                 .isExactlyInstanceOf(ReportPortalException.class)
