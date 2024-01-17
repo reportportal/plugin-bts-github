@@ -8,8 +8,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum GithubProperty {
     PROJECT("project", "BTS project"),
+    URL("url", "BTS url"),
     API_TOKEN("apiToken", "Access token"),
-    URL("url", "BTS url");
+    OWNER("owner", "BTS repository owner");
 
     private final String name;
     private final String title;

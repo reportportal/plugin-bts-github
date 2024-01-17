@@ -1,7 +1,7 @@
 package com.epam.reportportal.extension.github.command;
 
 import com.epam.ta.reportportal.exception.ReportPortalException;
-import org.jasypt.util.text.BasicTextEncryptor;
+import org.jasypt.util.text.TextEncryptor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,10 +24,11 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RetrieveCreateParamsCommandTest {
     private static final String PROJECT = "project";
-    private static final String API_TOKEN = "apiToken";
     private static final String URL = "url";
+    private static final String API_TOKEN = "apiToken";
+    private static final String OWNER = "owner";
     @Mock
-    private BasicTextEncryptor encryptor;
+    private TextEncryptor encryptor;
     @InjectMocks
     private RetrieveCreateParamsCommand command;
 
@@ -38,10 +39,12 @@ class RetrieveCreateParamsCommandTest {
 
     @Test
     void executeCommand_shouldReturnGithubProperties() {
-        var url = "example.com";
+        var owner = "reportportal";
         var project = "project name";
+        var url = "example.com";
         var apiToken = "3rrewdf";
-        Map<String, Object> inputParams = Map.of(URL, url,
+        Map<String, Object> inputParams = Map.of(OWNER, owner,
+                URL, url,
                 PROJECT, project,
                 API_TOKEN, apiToken
         );
@@ -51,6 +54,7 @@ class RetrieveCreateParamsCommandTest {
         Map<String, Object> githubProperties = command.executeCommand(inputParams);
 
         assertThat(githubProperties)
+                .hasEntrySatisfying(OWNER, obj -> assertThat(obj).isEqualTo(owner))
                 .hasEntrySatisfying(URL, obj -> assertThat(obj).isEqualTo(url))
                 .hasEntrySatisfying(PROJECT, obj -> assertThat(obj).isEqualTo(project))
                 .hasEntrySatisfying(API_TOKEN, obj -> assertThat(obj).isEqualTo(encryptedToken));
@@ -68,6 +72,7 @@ class RetrieveCreateParamsCommandTest {
     }
 
     static Stream<Arguments> missingParamsSource() {
+        var owner = "reportportal";
         var url = "example.com";
         var project = "project name";
         var apiToken = "3rrewdf";
@@ -75,36 +80,54 @@ class RetrieveCreateParamsCommandTest {
         var tokenNotSpecified = "Access token is not specified.";
         var projectNotSpecified = "BTS project is not specified.";
         var urlNotSpecified = "BTS url is not specified.";
+        var ownerNotSpecified = "BTS repository owner is not specified.";
 
         var blankString = "  ";
         return Stream.of(
                 Arguments.of(Map.of(
+                        OWNER, owner,
                         PROJECT, project,
                         API_TOKEN, apiToken
                 ), urlNotSpecified),
                 Arguments.of(Map.of(
                         URL, blankString,
+                        OWNER, owner,
                         PROJECT, project,
                         API_TOKEN, apiToken
                 ), urlNotSpecified),
                 Arguments.of(Map.of(
                         URL, url,
+                        OWNER, owner,
                         API_TOKEN, apiToken
                 ), projectNotSpecified),
                 Arguments.of(Map.of(
                         URL, url,
+                        OWNER, owner,
                         PROJECT, blankString,
                         API_TOKEN, apiToken
                 ), projectNotSpecified),
                 Arguments.of(Map.of(
                         URL, url,
+                        OWNER, owner,
                         PROJECT, project
+                ), tokenNotSpecified),
+                Arguments.of(Map.of(
+                        URL, url,
+                        OWNER, owner,
+                        PROJECT, project,
+                        API_TOKEN, blankString
                 ), tokenNotSpecified),
                 Arguments.of(Map.of(
                         URL, url,
                         PROJECT, project,
                         API_TOKEN, blankString
-                ), tokenNotSpecified)
+                ), ownerNotSpecified),
+                Arguments.of(Map.of(
+                        URL, url,
+                        OWNER, blankString,
+                        PROJECT, project,
+                        API_TOKEN, blankString
+                ), ownerNotSpecified)
         );
     }
 

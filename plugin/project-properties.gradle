@@ -6,6 +6,7 @@ def commonScriptsUrl = 'https://raw.githubusercontent.com/reportportal/gradle-sc
 project.ext {
     releaseMode = project.hasProperty("releaseMode")
     pluginsDir = "$buildDir/plugins"
+    dependencyRepos = ["plugin-api", "commons-bom"]
     scriptsUrl = commonScriptsUrl + (releaseMode ? getProperty('scripts.version') : 'develop')
     excludeTests = [
             '**/entity/**',
