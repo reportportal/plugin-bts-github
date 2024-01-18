@@ -1,11 +1,17 @@
 {
-  "scope": "plugin_name",
+  "scope": "GitHub",
   "extensions": [
     {
-      "name": "plugin",
-      "type": "uiExtension:settingsTab",
-      "title": "Plugin",
-      "moduleName": "./moduleName"
+      "name": "integrationFormFields",
+      "type": "uiExtension:integrationFormFields",
+      "title": "GitHub plugin fields",
+      "moduleName": "./integrationFormFields"
+    },
+    {
+      "name": "integrationSettings",
+      "type": "uiExtension:integrationSettings",
+      "title": "GitHub plugin settings",
+      "moduleName": "./integrationSettings"
     }
   ]
 }

@@ -1,6 +1,7 @@
 package com.epam.reportportal.extension.github;
 
 import com.epam.reportportal.extension.CommonPluginCommand;
+import com.epam.reportportal.extension.IntegrationGroupEnum;
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
 import com.epam.reportportal.extension.common.IntegrationTypeProperties;
@@ -10,10 +11,10 @@ import com.epam.reportportal.extension.github.command.GetIssueTypesCommand;
 import com.epam.reportportal.extension.github.command.RetrieveCreateParamsCommand;
 import com.epam.reportportal.extension.github.event.plugin.PluginEventHandlerFactory;
 import com.epam.reportportal.extension.github.event.plugin.PluginEventListener;
+import com.epam.reportportal.extension.github.info.impl.PluginInfoProviderImpl;
 import com.epam.reportportal.extension.github.utils.MemoizingSupplier;
 import com.epam.ta.reportportal.dao.IntegrationRepository;
 import com.epam.ta.reportportal.dao.IntegrationTypeRepository;
-import com.epam.ta.reportportal.dao.LogRepository;
 import com.epam.ta.reportportal.dao.ProjectRepository;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.pf4j.Extension;
@@ -35,56 +36,50 @@ import java.util.function.Supplier;
  */
 @Extension
 public class GitHubPluginExtension implements ReportPortalExtensionPoint, DisposableBean {
-
-    private static final String PLUGIN_ID = "GitHub";
     public static final String BINARY_DATA_PROPERTIES_FILE_ID = "binary-data.properties";
-
-    private Supplier<Map<String, PluginCommand>> pluginCommandMapping;
-
-    private Supplier<Map<String, CommonPluginCommand<?>>> commonPluginCommandMapping;
-
+    private static final String PLUGIN_ID = "GitHub";
+    private static final String DOCUMENTATION_LINK_FIELD = "documentationLink";
+    private static final String DOCUMENTATION_LINK = "https://reportportal.io/docs/plugins/GitHubBTS";
     private final String resourcesDir;
-
-    private final Supplier<ApplicationListener<PluginEvent>> pluginLoadedListener;
-
-    @Autowired
-    private IntegrationTypeRepository integrationTypeRepository;
-
-    @Autowired
-    private IntegrationRepository integrationRepository;
-
-    @Autowired
-    private LogRepository logRepository;
-
-    @Autowired
-    private ProjectRepository projectRepository;
-
+    private final Supplier<ApplicationListener<PluginEvent>> pluginLoadedListenerSupplier;
     @Autowired
     private ApplicationContext applicationContext;
-
+    @Autowired
+    private IntegrationTypeRepository integrationTypeRepository;
+    @Autowired
+    private IntegrationRepository integrationRepository;
+    @Autowired
+    private ProjectRepository projectRepository;
+    private final Supplier<Map<String, PluginCommand<?>>> pluginCommandMapping = new MemoizingSupplier<>(
+            this::getCommands);
     @Autowired
     private BasicTextEncryptor textEncryptor;
+    private final Supplier<Map<String, CommonPluginCommand<?>>> commonPluginCommandMapping = new MemoizingSupplier<>(
+            this::getCommonCommands);
 
     public GitHubPluginExtension(Map<String, Object> initParams) {
-        resourcesDir = IntegrationTypeProperties.RESOURCES_DIRECTORY.getValue(initParams).map(String::valueOf).orElse("");
+        resourcesDir = IntegrationTypeProperties.RESOURCES_DIRECTORY.getValue(initParams)
+                .map(String::valueOf).orElse("");
 
-        pluginLoadedListener = new MemoizingSupplier<>(() -> new PluginEventListener(PLUGIN_ID,
-                new PluginEventHandlerFactory(resourcesDir, integrationTypeRepository, integrationRepository)
-        ));
+        pluginLoadedListenerSupplier = new MemoizingSupplier<>(
+                () -> new PluginEventListener(PLUGIN_ID, new PluginEventHandlerFactory(
+                        integrationTypeRepository,
+                        integrationRepository,
+                        new PluginInfoProviderImpl(resourcesDir, BINARY_DATA_PROPERTIES_FILE_ID)
+                )));
     }
 
     @PostConstruct
     public void createIntegration() {
-        this.pluginCommandMapping = new MemoizingSupplier<>(this::getCommands);
-        this.commonPluginCommandMapping = new MemoizingSupplier<>(this::getCommonCommands);
         initListeners();
     }
 
     private void initListeners() {
-        ApplicationEventMulticaster applicationEventMulticaster = applicationContext.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME,
+        ApplicationEventMulticaster applicationEventMulticaster = applicationContext.getBean(
+                AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME,
                 ApplicationEventMulticaster.class
         );
-        applicationEventMulticaster.addApplicationListener(pluginLoadedListener.get());
+        applicationEventMulticaster.addApplicationListener(pluginLoadedListenerSupplier.get());
     }
 
     @Override
@@ -93,28 +88,35 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
     }
 
     private void removeListeners() {
-        ApplicationEventMulticaster applicationEventMulticaster = applicationContext.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME,
+        ApplicationEventMulticaster applicationEventMulticaster = applicationContext.getBean(
+                AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME,
                 ApplicationEventMulticaster.class
         );
-        applicationEventMulticaster.removeApplicationListener(pluginLoadedListener.get());
+        applicationEventMulticaster.removeApplicationListener(pluginLoadedListenerSupplier.get());
     }
 
     @Override
     public Map<String, ?> getPluginParams() {
         Map<String, Object> params = new HashMap<>();
         params.put(ALLOWED_COMMANDS, new ArrayList<>(pluginCommandMapping.get().keySet()));
+        params.put(DOCUMENTATION_LINK_FIELD, DOCUMENTATION_LINK);
         params.put(COMMON_COMMANDS, new ArrayList<>(commonPluginCommandMapping.get().keySet()));
         return params;
     }
 
     @Override
-    public CommonPluginCommand getCommonCommand(String commandName) {
+    public CommonPluginCommand<?> getCommonCommand(String commandName) {
         return commonPluginCommandMapping.get().get(commandName);
     }
 
     @Override
-    public PluginCommand getIntegrationCommand(String commandName) {
+    public PluginCommand<?> getIntegrationCommand(String commandName) {
         return pluginCommandMapping.get().get(commandName);
+    }
+
+    @Override
+    public IntegrationGroupEnum getIntegrationGroup() {
+        return IntegrationGroupEnum.BTS;
     }
 
     private Map<String, PluginCommand> getCommands() {
