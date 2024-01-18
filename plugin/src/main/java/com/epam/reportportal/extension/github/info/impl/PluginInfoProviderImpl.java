@@ -23,7 +23,7 @@ public class PluginInfoProviderImpl implements PluginInfoProvider {
     private static final String METADATA_KEY = "metadata";
 
     private static final String PLUGIN_DESCRIPTION =
-            "The integration provides an exchange of information between ReportPortal and the GitLab, such as posting issues and linking issues, getting updates on their statuses.";
+            "The integration provides an exchange of information between ReportPortal and the GitHub, such as posting issues and linking issues, getting updates on their statuses.";
     public static final Map<String, Object> PLUGIN_METADATA = new HashMap<>();
 
     static {
