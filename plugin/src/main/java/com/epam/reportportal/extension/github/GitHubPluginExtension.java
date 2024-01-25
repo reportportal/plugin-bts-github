@@ -11,7 +11,7 @@ import com.epam.reportportal.extension.github.command.GetIssueTypesCommand;
 import com.epam.reportportal.extension.github.command.RetrieveCreateParamsCommand;
 import com.epam.reportportal.extension.github.event.plugin.PluginEventHandlerFactory;
 import com.epam.reportportal.extension.github.event.plugin.PluginEventListener;
-import com.epam.reportportal.extension.github.info.impl.PluginInfoProviderImpl;
+import com.epam.reportportal.extension.github.info.impl.PropertiesFilePluginInfoProvider;
 import com.epam.reportportal.extension.github.utils.MemoizingSupplier;
 import com.epam.ta.reportportal.dao.IntegrationRepository;
 import com.epam.ta.reportportal.dao.IntegrationTypeRepository;
@@ -65,7 +65,7 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
                 () -> new PluginEventListener(PLUGIN_ID, new PluginEventHandlerFactory(
                         integrationTypeRepository,
                         integrationRepository,
-                        new PluginInfoProviderImpl(resourcesDir, BINARY_DATA_PROPERTIES_FILE_ID)
+                        new PropertiesFilePluginInfoProvider(resourcesDir, BINARY_DATA_PROPERTIES_FILE_ID)
                 )));
     }
 
@@ -119,7 +119,7 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
         return IntegrationGroupEnum.BTS;
     }
 
-    private Map<String, PluginCommand> getCommands() {
+    private Map<String, PluginCommand<?>> getCommands() {
         var getIssueTypesCommand = new GetIssueTypesCommand(projectRepository);
         var getIssueFieldsCommand = new GetIssueFieldsCommand(projectRepository);
         return Map.of(
