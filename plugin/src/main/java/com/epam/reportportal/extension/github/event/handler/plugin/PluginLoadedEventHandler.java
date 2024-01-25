@@ -1,51 +1,39 @@
 package com.epam.reportportal.extension.github.event.handler.plugin;
 
 import com.epam.reportportal.extension.event.PluginEvent;
-import com.epam.reportportal.extension.github.GitHubPluginExtension;
 import com.epam.reportportal.extension.github.event.handler.EventHandler;
+import com.epam.reportportal.extension.github.info.PluginInfoProvider;
 import com.epam.ta.reportportal.dao.IntegrationRepository;
 import com.epam.ta.reportportal.dao.IntegrationTypeRepository;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import com.epam.ta.reportportal.entity.integration.IntegrationParams;
 import com.epam.ta.reportportal.entity.integration.IntegrationType;
-import com.epam.ta.reportportal.exception.ReportPortalException;
-import com.epam.ta.reportportal.ws.model.ErrorType;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import static java.util.Optional.ofNullable;
 
 /**
  * @author Andrei Piankouski
  */
 public class PluginLoadedEventHandler implements EventHandler<PluginEvent> {
 
-	private static final String BINARY_DATA = "binaryData";
-
-	private final String resourcesDir;
 	private final IntegrationTypeRepository integrationTypeRepository;
 	private final IntegrationRepository integrationRepository;
+	private final PluginInfoProvider pluginInfoProvider;
 
-	public PluginLoadedEventHandler(String resourcesDir, IntegrationTypeRepository integrationTypeRepository,
-			IntegrationRepository integrationRepository) {
-		this.resourcesDir = resourcesDir;
+	public PluginLoadedEventHandler(IntegrationTypeRepository integrationTypeRepository, IntegrationRepository integrationRepository,
+			PluginInfoProvider pluginInfoProvider) {
 		this.integrationTypeRepository = integrationTypeRepository;
 		this.integrationRepository = integrationRepository;
+		this.pluginInfoProvider = pluginInfoProvider;
 	}
 
 	@Override
 	public void handle(PluginEvent event) {
 		integrationTypeRepository.findByName(event.getPluginId()).ifPresent(integrationType -> {
 			createIntegration(event.getPluginId(), integrationType);
-			loadBinaryDataInfo(integrationType);
+			integrationTypeRepository.save(pluginInfoProvider.provide(integrationType));
 		});
 	}
 
@@ -60,28 +48,6 @@ public class PluginLoadedEventHandler implements EventHandler<PluginEvent> {
 			integration.setCreator("SYSTEM");
 			integration.setParams(new IntegrationParams(new HashMap<>()));
 			integrationRepository.save(integration);
-		}
-	}
-
-	private void loadBinaryDataInfo(IntegrationType integrationType) {
-		Map<String, Object> details = integrationType.getDetails().getDetails();
-		if (ofNullable(details.get(BINARY_DATA)).isEmpty()) {
-			try (InputStream propertiesStream = Files.newInputStream(Paths.get(resourcesDir,
-					GitHubPluginExtension.BINARY_DATA_PROPERTIES_FILE_ID
-			))) {
-				Properties binaryDataProperties = new Properties();
-				binaryDataProperties.load(propertiesStream);
-				Map<String, String> binaryDataInfo = binaryDataProperties.entrySet()
-						.stream()
-						.collect(HashMap::new,
-								(map, entry) -> map.put(String.valueOf(entry.getKey()), String.valueOf(entry.getValue())),
-								HashMap::putAll
-						);
-				details.put(BINARY_DATA, binaryDataInfo);
-				integrationTypeRepository.save(integrationType);
-			} catch (IOException ex) {
-				throw new ReportPortalException(ErrorType.UNABLE_TO_LOAD_BINARY_DATA, ex.getMessage());
-			}
 		}
 	}
 }
