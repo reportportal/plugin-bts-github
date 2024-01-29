@@ -25,7 +25,7 @@ public class IssuesMapper {
         ticket.setTicketUrl(issueDto.getUrl().toString());
         ticket.setStatus(issueDto.getState());
         ticket.setSummary(issueDto.getTitle());
-        ticket.setPluginName("GitHub plugin");
+        ticket.setPluginName("GitHub Plugin");
 
         return ticket;
     }

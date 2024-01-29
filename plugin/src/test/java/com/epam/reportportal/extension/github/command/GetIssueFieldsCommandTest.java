@@ -21,6 +21,6 @@ class GetIssueFieldsCommandTest {
 
         List<PostFormField> actual = command.invokeCommand(null, null);
 
-        assertThat(actual).isEqualTo(GitHubIssueField.getAvailableFields());
+        assertThat(actual).isEqualTo(GitHubIssueField.getAvailableFieldsMeta());
     }
 }

@@ -2,15 +2,14 @@ package com.epam.reportportal.extension.github.command;
 
 import com.epam.ta.reportportal.ws.model.externalsystem.PostFormField;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
 public enum GitHubIssueField {
     TITLE(PostFormField.builder()
             .id("title")
@@ -59,11 +58,17 @@ public enum GitHubIssueField {
             .build()
     );
 
-    @Getter
-    private static final List<PostFormField> availableFields = Arrays.stream(GitHubIssueField.values())
-            .map(GitHubIssueField::getFieldMeta)
-            .collect(Collectors.toList());
     private final PostFormField fieldMeta;
+
+    public static List<PostFormField> getAvailableFieldsMeta() {
+        return Arrays.stream(GitHubIssueField.values())
+                .map(GitHubIssueField::getMetaCopy)
+                .collect(Collectors.toList());
+    }
+
+    private PostFormField getMetaCopy() {
+        return SerializationUtils.clone(fieldMeta);
+    }
 
     public String getId() {
         return fieldMeta.getId();

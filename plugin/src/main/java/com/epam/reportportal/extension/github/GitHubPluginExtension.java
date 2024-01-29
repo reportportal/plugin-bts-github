@@ -8,14 +8,17 @@ import com.epam.reportportal.extension.common.IntegrationTypeProperties;
 import com.epam.reportportal.extension.event.PluginEvent;
 import com.epam.reportportal.extension.github.command.GetIssueFieldsCommand;
 import com.epam.reportportal.extension.github.command.GetIssueTypesCommand;
+import com.epam.reportportal.extension.github.command.GitHubPropertyExtractor;
 import com.epam.reportportal.extension.github.command.PostTicketCommand;
 import com.epam.reportportal.extension.github.command.RetrieveCreateParamsCommand;
+import com.epam.reportportal.extension.github.entity.validator.RequestEntityValidatorWrapper;
 import com.epam.reportportal.extension.github.event.plugin.PluginEventHandlerFactory;
 import com.epam.reportportal.extension.github.event.plugin.PluginEventListener;
 import com.epam.reportportal.extension.github.generated.api.IssuesApi;
 import com.epam.reportportal.extension.github.info.impl.PropertiesFilePluginInfoProvider;
 import com.epam.reportportal.extension.github.provider.mapper.IssuesMapper;
 import com.epam.reportportal.extension.github.provider.rest.ApiClientCustomized;
+import com.epam.reportportal.extension.github.provider.rest.GitHubIssuesProviderFactory;
 import com.epam.reportportal.extension.github.utils.MemoizingSupplier;
 import com.epam.reportportal.extension.util.RequestEntityConverter;
 import com.epam.ta.reportportal.dao.IntegrationRepository;
@@ -50,6 +53,9 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
     private final String resourcesDir;
     private final IssuesApi issuesApi;
     private final IssuesMapper issuesMapper;
+    private final GitHubIssuesProviderFactory providerFactory;
+    private final RequestEntityValidatorWrapper requestEntityValidator;
+    private final MemoizingSupplier<GitHubPropertyExtractor> gitHubPropertyExtractor;
     private final Supplier<ApplicationListener<PluginEvent>> pluginLoadedListenerSupplier;
     private final Supplier<Map<String, PluginCommand<?>>> pluginCommandMapping;
     private final Supplier<Map<String, CommonPluginCommand<?>>> commonPluginCommandMapping;
@@ -82,9 +88,12 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
         this.requestEntityConverter = new MemoizingSupplier<>(() -> new RequestEntityConverter(objectMapper));
         this.pluginCommandMapping = new MemoizingSupplier<>(this::getCommands);
         this.commonPluginCommandMapping = new MemoizingSupplier<>(this::getCommonCommands);
+        this.gitHubPropertyExtractor = new MemoizingSupplier<>(() -> new GitHubPropertyExtractor(textEncryptor));
 
         this.issuesApi = new IssuesApi(new ApiClientCustomized());
         this.issuesMapper = new IssuesMapper();
+        this.requestEntityValidator = new RequestEntityValidatorWrapper();
+        this.providerFactory = new GitHubIssuesProviderFactory();
     }
 
     @PostConstruct
@@ -143,9 +152,10 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
         var postTicketCommand = new PostTicketCommand(
                 projectRepository,
                 requestEntityConverter.get(),
-                textEncryptor,
                 issuesApi,
-                issuesMapper);
+                issuesMapper,
+                requestEntityValidator,
+                gitHubPropertyExtractor.get(), providerFactory);
         return Map.of(
                 getIssueTypesCommand.getName(), getIssueTypesCommand,
                 getIssueFieldsCommand.getName(), getIssueFieldsCommand,
@@ -154,9 +164,7 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
     }
 
     private Map<String, CommonPluginCommand<?>> getCommonCommands() {
-        var retrieveCreateCommand = new RetrieveCreateParamsCommand(textEncryptor);
-        return Map.of(
-                retrieveCreateCommand.getName(), retrieveCreateCommand
-        );
+        var retrieveCreateCommand = new RetrieveCreateParamsCommand(gitHubPropertyExtractor.get());
+        return Map.of(retrieveCreateCommand.getName(), retrieveCreateCommand);
     }
 }

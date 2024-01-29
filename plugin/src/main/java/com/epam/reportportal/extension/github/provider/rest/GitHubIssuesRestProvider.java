@@ -3,13 +3,13 @@ package com.epam.reportportal.extension.github.provider.rest;
 import com.epam.reportportal.extension.github.generated.api.IssuesApi;
 import com.epam.reportportal.extension.github.generated.dto.IssueDto;
 import com.epam.reportportal.extension.github.generated.dto.IssuesCreateRequestDto;
-import com.epam.reportportal.extension.github.provider.GitHubIssuesAsyncProvider;
+import com.epam.reportportal.extension.github.provider.GitHubIssuesProvider;
 import com.epam.reportportal.extension.github.provider.mapper.IssuesMapper;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostTicketRQ;
 import com.epam.ta.reportportal.ws.model.externalsystem.Ticket;
 
 
-public class GitHubIssuesRestAsyncProvider implements GitHubIssuesAsyncProvider {
+public class GitHubIssuesRestProvider implements GitHubIssuesProvider {
     private static final String AUTH_TEMPLATE = "Bearer %s";
 
     private final IssuesApi issuesApi;
@@ -18,11 +18,11 @@ public class GitHubIssuesRestAsyncProvider implements GitHubIssuesAsyncProvider 
     private final String project;
     private final String authorization;
 
-    public GitHubIssuesRestAsyncProvider(IssuesApi issuesApi,
-                                         IssuesMapper issueMapper,
-                                         String owner,
-                                         String project,
-                                         String apiToken) {
+    public GitHubIssuesRestProvider(IssuesApi issuesApi,
+                                    IssuesMapper issueMapper,
+                                    String owner,
+                                    String project,
+                                    String apiToken) {
         this.issuesApi = issuesApi;
         this.issueMapper = issueMapper;
         this.owner = owner;

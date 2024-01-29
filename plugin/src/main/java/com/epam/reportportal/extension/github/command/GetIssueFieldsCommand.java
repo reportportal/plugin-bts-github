@@ -21,6 +21,6 @@ public class GetIssueFieldsCommand extends ProjectMemberCommand<List<PostFormFie
 
     @Override
     protected List<PostFormField> invokeCommand(Integration integration, Map<String, Object> params) {
-        return GitHubIssueField.getAvailableFields();
+        return GitHubIssueField.getAvailableFieldsMeta();
     }
 }

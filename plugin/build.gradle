@@ -58,6 +58,8 @@ dependencies {
     testImplementation "org.mockito:mockito-junit-jupiter"
     testImplementation "org.junit.jupiter:junit-jupiter-params"
     testImplementation "org.assertj:assertj-core:$assertjVersion"
+    testImplementation "uk.co.jemos.podam:podam:$podamVersion"
+    testImplementation "org.openapitools:jackson-databind-nullable:$openApiNullableVersion"
 }
 
 spotbugs {
