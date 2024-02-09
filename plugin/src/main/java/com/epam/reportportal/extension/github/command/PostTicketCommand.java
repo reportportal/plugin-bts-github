@@ -5,21 +5,20 @@ import com.epam.reportportal.extension.github.entity.validator.RequestEntityVali
 import com.epam.reportportal.extension.github.generated.api.IssuesApi;
 import com.epam.reportportal.extension.github.provider.mapper.IssuesMapper;
 import com.epam.reportportal.extension.github.provider.rest.GitHubIssuesProviderFactory;
+import com.epam.reportportal.extension.github.service.GitHubIssueService;
 import com.epam.reportportal.extension.util.CommandParamUtils;
 import com.epam.reportportal.extension.util.RequestEntityConverter;
 import com.epam.ta.reportportal.dao.ProjectRepository;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostTicketRQ;
 import com.epam.ta.reportportal.ws.model.externalsystem.Ticket;
-import org.apache.commons.collections4.CollectionUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
 import static com.epam.reportportal.extension.github.command.GitHubPropertyExtractor.GitHubProperties;
-import static com.epam.ta.reportportal.commons.validation.BusinessRule.expect;
-import static com.epam.ta.reportportal.ws.model.ErrorType.UNABLE_INTERACT_WITH_INTEGRATION;
-import static java.util.function.Predicate.not;
 
+@Slf4j
 public class PostTicketCommand extends ProjectMemberCommand<Ticket> {
 
     private final RequestEntityConverter requestEntityConverter;
@@ -28,6 +27,8 @@ public class PostTicketCommand extends ProjectMemberCommand<Ticket> {
     private final RequestEntityValidatorWrapper validator;
     private final GitHubPropertyExtractor propertyExtractor;
     private final GitHubIssuesProviderFactory providerFactory;
+    private final GitHubIssueService issueService;
+
 
     public PostTicketCommand(ProjectRepository projectRepository,
                              RequestEntityConverter requestEntityConverter,
@@ -35,7 +36,8 @@ public class PostTicketCommand extends ProjectMemberCommand<Ticket> {
                              IssuesMapper issuesMapper,
                              RequestEntityValidatorWrapper validator,
                              GitHubPropertyExtractor propertyExtractor,
-                             GitHubIssuesProviderFactory providerFactory) {
+                             GitHubIssuesProviderFactory providerFactory,
+                             GitHubIssueService issueService) {
         super(projectRepository);
         this.requestEntityConverter = requestEntityConverter;
         this.issuesApi = issuesApi;
@@ -43,6 +45,7 @@ public class PostTicketCommand extends ProjectMemberCommand<Ticket> {
         this.validator = validator;
         this.propertyExtractor = propertyExtractor;
         this.providerFactory = providerFactory;
+        this.issueService = issueService;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class PostTicketCommand extends ProjectMemberCommand<Ticket> {
                 props.getProject(),
                 props.getApiToken());
 
-        return issuesProvider.createIssue(ticketRequest);
+        return issueService.createIssue(issuesProvider, ticketRequest);
     }
 
     private void validate(PostTicketRQ ticketRequest) {

@@ -3,6 +3,7 @@ package com.epam.reportportal.extension.github.provider.rest;
 import com.epam.reportportal.extension.github.generated.api.IssuesApi;
 import com.epam.reportportal.extension.github.generated.dto.IssueDto;
 import com.epam.reportportal.extension.github.generated.dto.IssuesCreateRequestDto;
+import com.epam.reportportal.extension.github.model.GitHubIssue;
 import com.epam.reportportal.extension.github.provider.mapper.IssuesMapper;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostTicketRQ;
 import com.epam.ta.reportportal.ws.model.externalsystem.Ticket;
@@ -38,11 +39,11 @@ class GitHubIssuesRestProviderTest {
         var ticketExpected = new Ticket();
         when(issueMapper.mapToTicket(any())).thenReturn(ticketExpected);
 
-        var ticketRequest = new PostTicketRQ();
-        Ticket ticket = provider.createIssue(ticketRequest);
+        var issue = new GitHubIssue();
+        Ticket ticket = provider.createIssue(issue);
 
         assertThat(ticket).isEqualTo(ticketExpected);
-        verify(issueMapper).mapToIssueCreateRequestDto(ticketRequest);
+        verify(issueMapper).mapToIssueCreateRequestDto(issue);
         verify(issuesApi, only()).issuesCreate(OWNER, PROJECT, "Bearer " + TOKEN, requestDto);
         verify(issueMapper).mapToTicket(responseDto);
 

@@ -1,10 +1,10 @@
 package com.epam.reportportal.extension.github.provider;
 
-import com.epam.ta.reportportal.ws.model.externalsystem.PostTicketRQ;
+import com.epam.reportportal.extension.github.model.GitHubIssue;
 import com.epam.ta.reportportal.ws.model.externalsystem.Ticket;
 
 
 public interface GitHubIssuesProvider {
 
-    Ticket createIssue(PostTicketRQ ticketRequest);
+    Ticket createIssue(GitHubIssue ticketRequest);
 }

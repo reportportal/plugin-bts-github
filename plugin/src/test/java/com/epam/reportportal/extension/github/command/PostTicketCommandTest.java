@@ -5,9 +5,9 @@ import com.epam.reportportal.extension.github.generated.api.IssuesApi;
 import com.epam.reportportal.extension.github.provider.mapper.IssuesMapper;
 import com.epam.reportportal.extension.github.provider.rest.GitHubIssuesProviderFactory;
 import com.epam.reportportal.extension.github.provider.rest.GitHubIssuesRestProvider;
+import com.epam.reportportal.extension.github.service.GitHubIssueService;
 import com.epam.reportportal.extension.util.CommandParamUtils;
 import com.epam.reportportal.extension.util.RequestEntityConverter;
-import com.epam.ta.reportportal.dao.ProjectRepository;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import com.epam.ta.reportportal.entity.integration.IntegrationParams;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostFormField;
@@ -33,9 +33,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PostTicketCommandTest {
-
-    @Mock
-    private ProjectRepository projectRepository;
     @Mock
     private RequestEntityConverter requestEntityConverter;
     @Mock
@@ -48,6 +45,8 @@ class PostTicketCommandTest {
     private GitHubPropertyExtractor propertyExtractor;
     @Mock
     private GitHubIssuesProviderFactory providerFactory;
+    @Mock
+    private GitHubIssueService issueService;
 
     @InjectMocks
     private PostTicketCommand postTicketCommand;
@@ -77,7 +76,7 @@ class PostTicketCommandTest {
         GitHubIssuesRestProvider providerMock = mock(GitHubIssuesRestProvider.class);
         when(providerFactory.createProvider(any(), any(), any(), any(), any())).thenReturn(providerMock);
         var expectedTicket = new Ticket();
-        when(providerMock.createIssue(any())).thenReturn(expectedTicket);
+        when(issueService.createIssue(any(), any())).thenReturn(expectedTicket);
 
         Map<String, Object> params = Map.of();
         Ticket result = postTicketCommand.invokeCommand(integration, params);
@@ -93,7 +92,7 @@ class PostTicketCommandTest {
                 gitHubProperties.getOwner(),
                 gitHubProperties.getProject(),
                 gitHubProperties.getApiToken());
-        verify(providerMock).createIssue(ticketRequest);
+        verify(issueService).createIssue(providerMock, ticketRequest);
 
         verifyNoMoreInteractions(validator, requestEntityConverter, propertyExtractor, providerFactory);
     }
