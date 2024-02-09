@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class DescriptionService {
-    private static final String DESCRIPTION_HEADING = "##Description:\n";
-    private static final String COMMENTS_HEADING = "##Comments:\n";
-    private static final String LOGS_HEADING = "##Logs:\n";
+    private static final String DESCRIPTION_HEADING = "## Description:\n";
+    private static final String COMMENTS_HEADING = "## Comments:\n";
+    private static final String LOGS_HEADING = "## Logs:\n";
     private final TestItemRepository testItemRepository;
 
 
@@ -32,7 +32,7 @@ public class DescriptionService {
         var descriptionBuilder = new StringBuilder();
         descriptionBuilder.append(DESCRIPTION_HEADING);
         descriptionBuilder.append(testItem.getDescription());
-        descriptionBuilder.append("\n");
+        descriptionBuilder.append("\n\n");
 
         if (ticketRQ.getIsIncludeComments()) {
             descriptionBuilder.append(COMMENTS_HEADING);
@@ -40,7 +40,7 @@ public class DescriptionService {
                     .map(TestItemResults::getIssue)
                     .map(IssueEntity::getIssueDescription)
                     .ifPresent(descriptionBuilder::append);
-            descriptionBuilder.append("\n");
+            descriptionBuilder.append("\n\n");
         }
 
         if (ticketRQ.getIsIncludeLogs()) {
@@ -48,13 +48,13 @@ public class DescriptionService {
             String logs = testItem.getLogs()
                     .stream()
                     .map(Log::getLogMessage)
-                    .collect(Collectors.joining("\n"));
+                    .collect(Collectors.joining("\n\n"));
             Optional.of(logs)
                     .filter(StringUtils::isNotBlank)
                     .ifPresent(logsString -> {
                         descriptionBuilder.append(logs);
                     });
-            descriptionBuilder.append("\n");
+            descriptionBuilder.append("\n\n");
         }
 
         return descriptionBuilder.toString();

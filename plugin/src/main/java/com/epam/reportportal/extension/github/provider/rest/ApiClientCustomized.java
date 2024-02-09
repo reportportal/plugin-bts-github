@@ -13,7 +13,7 @@ public class ApiClientCustomized extends ApiClient {
     @Override
     protected RestTemplate buildRestTemplate() {
         RestTemplate restTemplate = super.buildRestTemplate();
-        restTemplate.getMessageConverters().add(createMappingJacksonHttpMessageConverter());
+        restTemplate.getMessageConverters().add(0, createMappingJacksonHttpMessageConverter());
 
         return restTemplate;
     }

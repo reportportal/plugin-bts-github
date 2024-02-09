@@ -53,13 +53,17 @@ class DescriptionServiceTest {
 
         assertThat(descriptionString)
                 .isNotEmpty()
-                .contains("##Description:\n" +
+                .contains("## Description:\n" +
                         "Test description\n" +
-                        "##Comments:\n" +
+                        "\n" +
+                        "## Comments:\n" +
                         "Test issue description\n" +
-                        "##Logs:\n" +
+                        "\n" +
+                        "## Logs:\n" +
                         "Log message 2\n" +
-                        "Log message 1\n"
+                        "\n" +
+                        "Log message 1\n" +
+                        "\n"
                 );
     }
 
@@ -79,8 +83,8 @@ class DescriptionServiceTest {
 
         assertThat(descriptionString)
                 .isNotEmpty()
-                .contains("##Description:\n" +
-                        "Test description\n"
+                .contains("## Description:\n" +
+                        "Test description\n\n"
                 );
     }
 
