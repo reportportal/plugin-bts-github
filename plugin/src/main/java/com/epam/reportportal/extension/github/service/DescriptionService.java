@@ -20,7 +20,7 @@ public class DescriptionService {
     private final TestItemRepository testItemRepository;
 
 
-    public String buildDescriptionString(PostTicketRQ ticketRQ) {
+    public String buildDescriptionString(PostTicketRQ ticketRQ, String additionalDescription) {
 
         Optional<TestItem> testItemOptional = testItemRepository.findById(ticketRQ.getTestItemId());
 
@@ -31,6 +31,8 @@ public class DescriptionService {
         TestItem testItem = testItemOptional.get();
         var descriptionBuilder = new StringBuilder();
         descriptionBuilder.append(DESCRIPTION_HEADING);
+        descriptionBuilder.append(additionalDescription);
+        descriptionBuilder.append("\n");
         descriptionBuilder.append(testItem.getDescription());
         descriptionBuilder.append("\n\n");
 

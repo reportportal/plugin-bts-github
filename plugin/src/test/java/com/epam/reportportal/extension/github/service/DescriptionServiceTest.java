@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DescriptionServiceTest {
+    public static final String ADDITIONAL_DESCRIPTION = "additional";
     @Mock
     private TestItemRepository testItemRepository;
     @InjectMocks
@@ -33,7 +34,7 @@ class DescriptionServiceTest {
 
         when(testItemRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        String descriptionString = descriptionService.buildDescriptionString(ticketRQ);
+        String descriptionString = descriptionService.buildDescriptionString(ticketRQ, ADDITIONAL_DESCRIPTION);
 
         assertThat(descriptionString).isEmpty();
     }
@@ -49,11 +50,12 @@ class DescriptionServiceTest {
 
         when(testItemRepository.findById(anyLong())).thenReturn(Optional.of(testItem));
 
-        String descriptionString = descriptionService.buildDescriptionString(ticketRQ);
+        String descriptionString = descriptionService.buildDescriptionString(ticketRQ, ADDITIONAL_DESCRIPTION);
 
         assertThat(descriptionString)
                 .isNotEmpty()
                 .contains("## Description:\n" +
+                        "additional\n" +
                         "Test description\n" +
                         "\n" +
                         "## Comments:\n" +
@@ -79,11 +81,12 @@ class DescriptionServiceTest {
 
         when(testItemRepository.findById(anyLong())).thenReturn(Optional.of(testItem));
 
-        String descriptionString = descriptionService.buildDescriptionString(ticketRQ);
+        String descriptionString = descriptionService.buildDescriptionString(ticketRQ, ADDITIONAL_DESCRIPTION);
 
         assertThat(descriptionString)
                 .isNotEmpty()
                 .contains("## Description:\n" +
+                        "additional\n" +
                         "Test description\n\n"
                 );
     }

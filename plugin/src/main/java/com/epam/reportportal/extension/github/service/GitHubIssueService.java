@@ -6,6 +6,7 @@ import com.epam.ta.reportportal.ws.model.externalsystem.PostFormField;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostTicketRQ;
 import com.epam.ta.reportportal.ws.model.externalsystem.Ticket;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +34,7 @@ public class GitHubIssueService {
             if (TITLE.getId().equals(fieldId)) {
                 issue.setTitle(getSingleValue(field));
             } else if (BODY.getId().equals(fieldId)) {
-                issue.setDescription(getSingleValue(field));
+                issue.setDescription(getDescription(ticketRequest, getSingleValue(field)));
             } else if (LABELS.getId().equals(fieldId)) {
                 issue.setLabels(field.getValue());
             } else if (ASSIGNEES.getId().equals(fieldId)) {
@@ -44,14 +45,14 @@ public class GitHubIssueService {
         });
 
         if (issue.getDescription() == null) {
-            issue.setDescription(getDescription(ticketRequest));
+            issue.setDescription(getDescription(ticketRequest, StringUtils.EMPTY));
         }
 
         return issue;
     }
 
-    private String getDescription(PostTicketRQ ticketRequest) {
-        return descriptionService.buildDescriptionString(ticketRequest);
+    private String getDescription(PostTicketRQ ticketRequest, String initialDescription) {
+        return descriptionService.buildDescriptionString(ticketRequest, initialDescription);
     }
 
     private static String getSingleValue(PostFormField field) {

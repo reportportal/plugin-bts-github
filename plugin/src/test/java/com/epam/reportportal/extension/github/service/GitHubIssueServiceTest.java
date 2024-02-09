@@ -6,6 +6,7 @@ import com.epam.reportportal.extension.github.provider.GitHubIssuesProvider;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostFormField;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostTicketRQ;
 import com.epam.ta.reportportal.ws.model.externalsystem.Ticket;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -21,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,20 +46,23 @@ public class GitHubIssueServiceTest {
 
         var ticket = new Ticket();
         when(issuesRestProvider.createIssue(any())).thenReturn(ticket);
+        var testDescription = "test desc";
+        when(descriptionService.buildDescriptionString(any(), any())).thenReturn(testDescription);
 
         Ticket createdTicket = gitHubIssueService.createIssue(issuesRestProvider, ticketRQ);
 
         assertThat(createdTicket).isEqualTo(ticket);
 
         verify(issuesRestProvider, only()).createIssue(issueArgumentCaptor.capture());
-        verifyNoInteractions(descriptionService);
+        verify(descriptionService, only()).buildDescriptionString(ticketRQ, "body sample");
         GitHubIssue gitHubIssue = issueArgumentCaptor.getValue();
 
         assertThat(gitHubIssue.getTitle()).isEqualTo("Bug found");
+        assertThat(gitHubIssue.getDescription()).isEqualTo(testDescription);
         assertThat(gitHubIssue.getAssignees()).containsExactlyInAnyOrder("user1", "user2");
         assertThat(gitHubIssue.getLabels()).containsExactlyInAnyOrder("bug", "severe");
         assertThat(gitHubIssue.getMilestone()).isEqualTo("milestone 1");
-        assertThat(gitHubIssue.getDescription()).isEqualTo("body sample");
+        assertThat(gitHubIssue.getDescription()).isEqualTo("test desc");
     }
 
     @Test
@@ -70,14 +73,14 @@ public class GitHubIssueServiceTest {
         var ticket = new Ticket();
         when(issuesRestProvider.createIssue(any())).thenReturn(ticket);
         var testDescription = "test description";
-        when(descriptionService.buildDescriptionString(any())).thenReturn(testDescription);
+        when(descriptionService.buildDescriptionString(any(), any())).thenReturn(testDescription);
 
         Ticket createdTicket = gitHubIssueService.createIssue(issuesRestProvider, ticketRQ);
 
         assertThat(createdTicket).isEqualTo(ticket);
 
         verify(issuesRestProvider, only()).createIssue(issueArgumentCaptor.capture());
-        verify(descriptionService, only()).buildDescriptionString(ticketRQ);
+        verify(descriptionService, only()).buildDescriptionString(ticketRQ, StringUtils.EMPTY);
         GitHubIssue gitHubIssue = issueArgumentCaptor.getValue();
 
         assertThat(gitHubIssue.getDescription()).isEqualTo(testDescription);
