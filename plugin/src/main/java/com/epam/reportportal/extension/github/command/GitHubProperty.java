@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public enum GithubProperty {
+public enum GitHubProperty {
     PROJECT("project", "BTS project"),
     URL("url", "BTS url"),
     API_TOKEN("apiToken", "Access token"),
