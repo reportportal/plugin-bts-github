@@ -11,6 +11,7 @@ import com.epam.reportportal.extension.github.command.GetIssueTypesCommand;
 import com.epam.reportportal.extension.github.command.GitHubPropertyExtractor;
 import com.epam.reportportal.extension.github.command.PostTicketCommand;
 import com.epam.reportportal.extension.github.command.RetrieveCreateParamsCommand;
+import com.epam.reportportal.extension.github.command.RetrieveUpdateCommand;
 import com.epam.reportportal.extension.github.entity.validator.RequestEntityValidatorWrapper;
 import com.epam.reportportal.extension.github.event.plugin.PluginEventHandlerFactory;
 import com.epam.reportportal.extension.github.event.plugin.PluginEventListener;
@@ -176,6 +177,10 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
 
     private Map<String, CommonPluginCommand<?>> getCommonCommands() {
         var retrieveCreateCommand = new RetrieveCreateParamsCommand(gitHubPropertyExtractor.get());
-        return Map.of(retrieveCreateCommand.getName(), retrieveCreateCommand);
+        var retrieveUpdateCommand = new RetrieveUpdateCommand(gitHubPropertyExtractor.get());
+        return Map.of(
+                retrieveCreateCommand.getName(), retrieveCreateCommand,
+                retrieveUpdateCommand.getName(), retrieveUpdateCommand
+        );
     }
 }

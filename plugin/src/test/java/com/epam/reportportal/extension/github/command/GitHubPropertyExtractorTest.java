@@ -4,12 +4,17 @@ import com.epam.ta.reportportal.exception.ReportPortalException;
 import org.jasypt.util.text.TextEncryptor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.epam.reportportal.extension.github.command.GitHubProperty.API_TOKEN;
 import static com.epam.reportportal.extension.github.command.GitHubProperty.URL;
@@ -79,5 +84,43 @@ class GitHubPropertyExtractorTest {
                 propertyExtractor.getRequiredParamEncrypted(Map.of("apiToken", token), API_TOKEN);
 
         assertThat(actual).isEqualTo(encrypted);
+    }
+
+    @Test
+    void getOptionalParam_shouldReturnOptionalWithValue_whenValueIsPresentInMapByKey() {
+        var url = "https://github.com";
+
+        Optional<String> actual =
+                propertyExtractor.getOptionalParam(Map.of("url", url), URL);
+
+        assertThat(actual).isNotEmpty().get().isEqualTo(url);
+    }
+
+    @ParameterizedTest
+    @MethodSource("missingParamSource")
+    void getOptionalParam_shouldReturnOptionalWithValue_whenIsNotPresentInMapByKeyOrBlank(Map<String, Object> params) {
+        Optional<String> actual =
+                propertyExtractor.getOptionalParam(params, URL);
+
+        assertThat(actual).isEmpty();
+    }
+
+    static Stream<Arguments> missingParamSource() {
+        return Stream.of(
+                Arguments.of(Map.of("url", " ")),
+                Arguments.of(Map.of())
+        );
+    }
+
+    @Test
+    void getOptionalParamEncrypted_shouldReturnOptionalWithEncryptedValue_whenParamIsPresentInMap() {
+        var encrypted = "encrypted";
+        when(textEncryptor.encrypt(anyString())).thenReturn(encrypted);
+
+        var token = "raw";
+        Optional<String> actual =
+                propertyExtractor.getOptionalParamEncrypted(Map.of("apiToken", token), API_TOKEN);
+
+        assertThat(actual).isPresent().get().isEqualTo(encrypted);
     }
 }
