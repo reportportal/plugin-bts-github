@@ -18,7 +18,7 @@ public class RetrieveUpdateCommand implements CommonPluginCommand<Map<String, Ob
 
     @Override
     public String getName() {
-        return "retrieveUpdate";
+        return "retrieveUpdated";
     }
 
     @Override

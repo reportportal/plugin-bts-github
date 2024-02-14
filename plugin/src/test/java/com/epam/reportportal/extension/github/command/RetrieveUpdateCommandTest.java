@@ -31,7 +31,7 @@ class RetrieveUpdateCommandTest {
 
     @Test
     void getName_shouldReturnCommandName() {
-        assertThat(command.getName()).isEqualTo("retrieveUpdate");
+        assertThat(command.getName()).isEqualTo("retrieveUpdated");
     }
 
     @Test
