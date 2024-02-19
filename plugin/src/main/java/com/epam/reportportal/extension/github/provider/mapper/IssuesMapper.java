@@ -11,7 +11,7 @@ public class IssuesMapper {
         Ticket ticket = new Ticket();
 
         ticket.setId(String.valueOf(issueDto.getId()));
-        ticket.setTicketUrl(issueDto.getUrl().toString());
+        ticket.setTicketUrl(issueDto.getHtmlUrl().toString());
         ticket.setStatus(issueDto.getState());
         ticket.setSummary(issueDto.getTitle());
         ticket.setPluginName("GitHub Plugin");

@@ -24,7 +24,7 @@ class IssuesMapperTest {
         assertThat(ticket.getId()).isEqualTo(issueDto.getId().toString());
         assertThat(ticket.getSummary()).isEqualTo(issueDto.getTitle());
         assertThat(ticket.getStatus()).isEqualTo(issueDto.getState());
-        assertThat(ticket.getTicketUrl()).isEqualTo(issueDto.getUrl().toString());
+        assertThat(ticket.getTicketUrl()).isEqualTo(issueDto.getHtmlUrl().toString());
         assertThat(ticket.getPluginName()).isEqualTo("GitHub Plugin");
     }
 
