@@ -6,6 +6,7 @@ import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
 import com.epam.reportportal.extension.common.IntegrationTypeProperties;
 import com.epam.reportportal.extension.event.PluginEvent;
+import com.epam.reportportal.extension.github.command.GetIssueCommand;
 import com.epam.reportportal.extension.github.command.GetIssueFieldsCommand;
 import com.epam.reportportal.extension.github.command.GetIssueTypesCommand;
 import com.epam.reportportal.extension.github.command.GitHubPropertyExtractor;
@@ -27,6 +28,7 @@ import com.epam.ta.reportportal.dao.IntegrationRepository;
 import com.epam.ta.reportportal.dao.IntegrationTypeRepository;
 import com.epam.ta.reportportal.dao.ProjectRepository;
 import com.epam.ta.reportportal.dao.TestItemRepository;
+import com.epam.ta.reportportal.dao.TicketRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.pf4j.Extension;
@@ -78,7 +80,9 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    TestItemRepository testItemRepository;
+    private TestItemRepository testItemRepository;
+    @Autowired
+    private TicketRepository ticketRepository;
 
 
     public GitHubPluginExtension(Map<String, Object> initParams) {
@@ -176,6 +180,15 @@ public class GitHubPluginExtension implements ReportPortalExtensionPoint, Dispos
 
     private Map<String, CommonPluginCommand<?>> getCommonCommands() {
         var retrieveCreateCommand = new RetrieveCreateParamsCommand(gitHubPropertyExtractor.get());
-        return Map.of(retrieveCreateCommand.getName(), retrieveCreateCommand);
+        var getIssueCommand = new GetIssueCommand(
+                integrationRepository,
+                ticketRepository,
+                issuesApi,
+                issuesMapper,
+                gitHubPropertyExtractor.get(),
+                providerFactory,
+                gitHubIssueServiceSupplier.get());
+        return Map.of(retrieveCreateCommand.getName(), retrieveCreateCommand,
+                getIssueCommand.getName(), getIssueCommand);
     }
 }

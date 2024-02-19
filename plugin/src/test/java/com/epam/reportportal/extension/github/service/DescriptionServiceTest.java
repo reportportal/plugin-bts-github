@@ -91,6 +91,28 @@ class DescriptionServiceTest {
                 );
     }
 
+    @Test
+    void buildDescriptionString_shouldNotIncludeAdditionalDesc_whenAdditionalDescIsNull() {
+        // given
+        var ticketRQ = new PostTicketRQ();
+        ticketRQ.setTestItemId(1L);
+        ticketRQ.setIsIncludeComments(false);
+        ticketRQ.setIsIncludeLogs(false);
+        var testItem = new TestItem();
+        testItem.setDescription("Test description");
+
+        // when
+        when(testItemRepository.findById(anyLong())).thenReturn(Optional.of(testItem));
+        String descriptionString = descriptionService.buildDescriptionString(ticketRQ, null);
+
+        // then
+        assertThat(descriptionString)
+                .isNotEmpty()
+                .contains("## Description:\n" +
+                          "Test description\n\n"
+                );
+    }
+
     private static TestItem getTestItem() {
         var testItem = new TestItem();
         testItem.setDescription("Test description");

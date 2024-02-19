@@ -37,6 +37,11 @@ public class GitHubPropertyExtractor {
                 .orElseThrow(() -> buildException(property));
     }
 
+     public Object getRequiredParamWithoutCasting(Map<String, ?> params, GitHubProperty property) {
+        return Optional.ofNullable(params.get(property.getName()))
+                .orElseThrow(() -> buildException(property));
+    }
+
     public String getRequiredParamDecrypted(Map<String, ?> params, GitHubProperty property) {
         return textEncryptor.decrypt(getRequiredParam(params, property));
     }

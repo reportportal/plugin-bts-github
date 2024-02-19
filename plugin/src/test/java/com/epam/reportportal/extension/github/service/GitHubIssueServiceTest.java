@@ -86,6 +86,21 @@ public class GitHubIssueServiceTest {
         assertThat(gitHubIssue.getDescription()).isEqualTo(testDescription);
     }
 
+    @Test
+    void getIssue_shouldReturnIssue() {
+        // given
+        var ticket = new Ticket();
+        var issueId = "1";
+
+        // when
+        when(issuesRestProvider.getIssue(issueId)).thenReturn(ticket);
+        Ticket result = gitHubIssueService.getIssue(issuesRestProvider, issueId);
+
+        // then
+        assertThat(result).isNotNull();
+        verify(issuesRestProvider, only()).getIssue(issueId);
+    }
+
     private static List<PostFormField> getFieldsWithValues() {
         Map<String, List<String>> valuesForFields = Map.of(
                 GitHubIssueField.BODY.getId(), List.of("body sample"),

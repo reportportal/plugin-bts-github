@@ -21,7 +21,7 @@ class IssuesMapperTest {
         Ticket ticket = mapper.mapToTicket(issueDto);
 
         assertThat(ticket).hasNoNullFieldsOrProperties();
-        assertThat(ticket.getId()).isEqualTo(issueDto.getId().toString());
+        assertThat(ticket.getId()).isEqualTo(issueDto.getNumber().toString());
         assertThat(ticket.getSummary()).isEqualTo(issueDto.getTitle());
         assertThat(ticket.getStatus()).isEqualTo(issueDto.getState());
         assertThat(ticket.getTicketUrl()).isEqualTo(issueDto.getUrl().toString());

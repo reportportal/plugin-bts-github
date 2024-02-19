@@ -10,8 +10,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.epam.reportportal.extension.github.command.GitHubProperty.API_TOKEN;
+import static com.epam.reportportal.extension.github.command.GitHubProperty.PROJECT_ID;
+import static com.epam.reportportal.extension.github.command.GitHubProperty.TICKET_ID;
 import static com.epam.reportportal.extension.github.command.GitHubProperty.URL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -79,5 +82,28 @@ class GitHubPropertyExtractorTest {
                 propertyExtractor.getRequiredParamEncrypted(Map.of("apiToken", token), API_TOKEN);
 
         assertThat(actual).isEqualTo(encrypted);
+    }
+
+    @Test
+    void getRequiredParamWithoutCasting_shouldThrowException_whenNoRequiredParamProvided() {
+        assertThatThrownBy(() -> propertyExtractor.getRequiredParamWithoutCasting(Map.of(), URL))
+                .isExactlyInstanceOf(ReportPortalException.class)
+                .hasMessageContaining(URL.getTitle() + " is not specified");
+    }
+
+    @Test
+    void getRequiredParamWithoutCasting_shouldReturnValueWithoutAsObject() {
+        var longValue = 1L;
+        var stringValue = "string";
+        var params = Map.of(
+                PROJECT_ID.getName(), longValue,
+                TICKET_ID.getName(), stringValue
+        );
+
+        Object projectId = propertyExtractor.getRequiredParamWithoutCasting(params, PROJECT_ID);
+        Object ticketId = propertyExtractor.getRequiredParamWithoutCasting(params, TICKET_ID);
+
+        assertThat(projectId).isExactlyInstanceOf(Long.class);
+        assertThat(ticketId).isExactlyInstanceOf(String.class);
     }
 }

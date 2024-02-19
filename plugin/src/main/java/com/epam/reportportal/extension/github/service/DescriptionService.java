@@ -31,8 +31,11 @@ public class DescriptionService {
         TestItem testItem = testItemOptional.get();
         var descriptionBuilder = new StringBuilder();
         descriptionBuilder.append(DESCRIPTION_HEADING);
-        descriptionBuilder.append(additionalDescription);
-        descriptionBuilder.append("\n");
+        Optional.ofNullable(additionalDescription)
+                .ifPresent(v -> {
+                    descriptionBuilder.append(v);
+                    descriptionBuilder.append("\n");
+                });
         descriptionBuilder.append(testItem.getDescription());
         descriptionBuilder.append("\n\n");
 
@@ -53,9 +56,7 @@ public class DescriptionService {
                     .collect(Collectors.joining("\n\n"));
             Optional.of(logs)
                     .filter(StringUtils::isNotBlank)
-                    .ifPresent(logsString -> {
-                        descriptionBuilder.append(logs);
-                    });
+                    .ifPresent(descriptionBuilder::append);
             descriptionBuilder.append("\n\n");
         }
 
