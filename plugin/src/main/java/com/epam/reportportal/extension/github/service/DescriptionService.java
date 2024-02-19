@@ -56,7 +56,9 @@ public class DescriptionService {
                     .collect(Collectors.joining("\n\n"));
             Optional.of(logs)
                     .filter(StringUtils::isNotBlank)
-                    .ifPresent(descriptionBuilder::append);
+                    .ifPresent(logsString -> {
+                        descriptionBuilder.append(logs);
+                    });
             descriptionBuilder.append("\n\n");
         }
 

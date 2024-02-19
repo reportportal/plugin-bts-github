@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.epam.reportportal.extension.github.command.GitHubProperty.API_TOKEN;
 import static com.epam.reportportal.extension.github.command.GitHubProperty.PROJECT_ID;
