@@ -31,10 +31,14 @@ public class GitHubPropertyExtractor {
     }
 
     public String getRequiredParam(Map<String, ?> params, GitHubProperty property) {
+        return getOptionalParam(params, property)
+                .orElseThrow(() -> buildException(property));
+    }
+
+    public Optional<String> getOptionalParam(Map<String, ?> params, GitHubProperty property) {
         return Optional.ofNullable(params.get(property.getName()))
                 .map(obj -> (String) obj)
-                .filter(StringUtils::isNotBlank)
-                .orElseThrow(() -> buildException(property));
+                .filter(StringUtils::isNotBlank);
     }
 
      public Object getRequiredParamWithoutCasting(Map<String, ?> params, GitHubProperty property) {
@@ -48,6 +52,11 @@ public class GitHubPropertyExtractor {
 
     public String getRequiredParamEncrypted(Map<String, ?> params, GitHubProperty property) {
         return textEncryptor.encrypt(getRequiredParam(params, property));
+    }
+
+    public Optional<String> getOptionalParamEncrypted(Map<String, ?> params, GitHubProperty property) {
+        return getOptionalParam(params, property)
+                .map(textEncryptor::encrypt);
     }
 
     private static ReportPortalException buildException(GitHubProperty property) {
