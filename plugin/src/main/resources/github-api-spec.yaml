@@ -104,6 +104,47 @@ paths:
         enabledForGitHubApps: true
         category: issues
         subcategory: issues
+  '/repos/{owner}/{repo}/issues/{issue_number}':
+    get:
+      summary: Get an issue
+      description: |-
+        The API returns a [`301 Moved Permanently` status](https://docs.github.com/rest/guides/best-practices-for-using-the-rest-api#follow-redirects) if the issue was
+        [transferred](https://docs.github.com/articles/transferring-an-issue-to-another-repository/) to another repository. If
+        the issue was transferred to or deleted from a repository where the authenticated user lacks read access, the API
+        returns a `404 Not Found` status. If the issue was deleted from a repository where the authenticated user has read
+        access, the API returns a `410 Gone` status. To receive webhook events for transferred and deleted issues, subscribe
+        to the [`issues`](https://docs.github.com/webhooks/event-payloads/#issues) webhook.
+      tags:
+        - issues
+      operationId: issues/get
+      externalDocs:
+        description: API method documentation
+        url: https://docs.github.com/rest/issues/issues#get-an-issue
+      parameters:
+        - $ref: '#/components/parameters/owner'
+        - $ref: '#/components/parameters/repo'
+        - $ref: "#/components/parameters/issue-number"
+        - $ref: '#/components/parameters/auth'
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/issue"
+        '301':
+          $ref: "#/components/responses/moved_permanently"
+        '304':
+          $ref: "#/components/responses/not_modified"
+        '404':
+          $ref: "#/components/responses/not_found"
+        '410':
+          $ref: "#/components/responses/gone"
+      x-github:
+        githubCloudOnly: false
+        enabledForGitHubApps: true
+        category: issues
+        subcategory: issues
 components:
   parameters:
     auth:
@@ -127,6 +168,13 @@ components:
       required: true
       schema:
         type: string
+    issue-number:
+      name: issue_number
+      description: The number that identifies the issue.
+      in: path
+      required: true
+      schema:
+        type: integer
   schemas:
     simple-user:
       description: A GitHub user.
@@ -1482,6 +1530,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/basic-error'
+    moved_permanently:
+      description: Moved permanently
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/basic-error"
+    not_modified:
+      description: Not modified
 tags:
   - name: issues
     description: Interact with GitHub Issues.

@@ -5,11 +5,11 @@ import com.epam.reportportal.extension.github.generated.dto.IssueDto;
 import com.epam.reportportal.extension.github.generated.dto.IssuesCreateRequestDto;
 import com.epam.reportportal.extension.github.model.GitHubIssue;
 import com.epam.reportportal.extension.github.provider.mapper.IssuesMapper;
-import com.epam.ta.reportportal.ws.model.externalsystem.PostTicketRQ;
 import com.epam.ta.reportportal.ws.model.externalsystem.Ticket;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.only;
@@ -48,5 +48,30 @@ class GitHubIssuesRestProviderTest {
         verify(issueMapper).mapToTicket(responseDto);
 
         verifyNoMoreInteractions(issueMapper);
+    }
+
+    @Test
+    void shouldReturnIssue() {
+        // given
+        var issueId = "12";
+        var responseDto = new IssueDto();
+        when(issuesApi.issuesGet(any(), any(), any(), any())).thenReturn(responseDto);
+        var ticketExpected = new Ticket();
+        when(issueMapper.mapToTicket(any())).thenReturn(ticketExpected);
+
+        // when
+        Ticket ticket = provider.getIssue(issueId);
+
+        // then
+        assertThat(ticket).isEqualTo(ticketExpected);
+        verify(issuesApi, only()).issuesGet(OWNER, PROJECT, 12, "Bearer " + TOKEN);
+        verify(issueMapper).mapToTicket(responseDto);
+        verifyNoMoreInteractions(issueMapper, issuesApi);
+    }
+
+    @Test
+    void shouldThrownExceptionWhenIssueIdIsNotNumber() {
+        assertThatThrownBy(() -> provider.getIssue("abc"))
+                .isExactlyInstanceOf(NumberFormatException.class);
     }
 }

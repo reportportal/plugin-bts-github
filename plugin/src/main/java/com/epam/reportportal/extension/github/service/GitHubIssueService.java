@@ -26,6 +26,10 @@ public class GitHubIssueService {
         return issuesRestProvider.createIssue(buildIssue(postTicketRQ));
     }
 
+    public Ticket getIssue(GitHubIssuesProvider issuesRestProvider, String issueId) {
+        return issuesRestProvider.getIssue(issueId);
+    }
+
     private GitHubIssue buildIssue(PostTicketRQ ticketRequest) {
         var issue = new GitHubIssue();
         ticketRequest.getFields().forEach(field -> {

@@ -1,9 +1,9 @@
 package com.epam.reportportal.extension.github.provider.rest;
 
-import com.epam.reportportal.extension.github.model.GitHubIssue;
 import com.epam.reportportal.extension.github.generated.api.IssuesApi;
 import com.epam.reportportal.extension.github.generated.dto.IssueDto;
 import com.epam.reportportal.extension.github.generated.dto.IssuesCreateRequestDto;
+import com.epam.reportportal.extension.github.model.GitHubIssue;
 import com.epam.reportportal.extension.github.provider.GitHubIssuesProvider;
 import com.epam.reportportal.extension.github.provider.mapper.IssuesMapper;
 import com.epam.ta.reportportal.ws.model.externalsystem.Ticket;
@@ -34,6 +34,12 @@ public class GitHubIssuesRestProvider implements GitHubIssuesProvider {
     public Ticket createIssue(GitHubIssue ticketRequest) {
         IssuesCreateRequestDto requestDto = issueMapper.mapToIssueCreateRequestDto(ticketRequest);
         IssueDto issueDto = issuesApi.issuesCreate(owner, project, authorization, requestDto);
+        return issueMapper.mapToTicket(issueDto);
+    }
+
+    @Override
+    public Ticket getIssue(String issueId) {
+        IssueDto issueDto = issuesApi.issuesGet(owner, project, Integer.valueOf(issueId), authorization);
         return issueMapper.mapToTicket(issueDto);
     }
 }

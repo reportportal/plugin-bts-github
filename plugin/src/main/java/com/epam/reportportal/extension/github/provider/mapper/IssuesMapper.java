@@ -10,7 +10,7 @@ public class IssuesMapper {
     public Ticket mapToTicket(IssueDto issueDto) {
         Ticket ticket = new Ticket();
 
-        ticket.setId(String.valueOf(issueDto.getId()));
+        ticket.setId(String.valueOf(issueDto.getNumber()));
         ticket.setTicketUrl(issueDto.getHtmlUrl().toString());
         ticket.setStatus(issueDto.getState());
         ticket.setSummary(issueDto.getTitle());
