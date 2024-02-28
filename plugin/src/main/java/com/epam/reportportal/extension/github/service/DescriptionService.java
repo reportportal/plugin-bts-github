@@ -9,6 +9,8 @@ import com.epam.ta.reportportal.ws.model.externalsystem.PostTicketRQ;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Comparator;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -18,6 +20,7 @@ public class DescriptionService {
     private static final String BACKLINK_HEADING = "## Back links to Report Portal:\n";
     private static final String COMMENTS_HEADING = "## Comments:\n";
     private static final String LOGS_HEADING = "## Logs:\n";
+    private static final String BACK_LINK_PATTERN = "[Link to defect](%s)%n";
     private final TestItemRepository testItemRepository;
 
 
@@ -32,9 +35,10 @@ public class DescriptionService {
         TestItem testItem = testItemOptional.get();
         var descriptionBuilder = new StringBuilder();
         descriptionBuilder.append(BACKLINK_HEADING);
-        ticketRQ.getBackLinks().forEach((id, link) -> {
-            descriptionBuilder.append(String.format("[Link to %s](%s)%n", id, link));
-        });
+        ticketRQ.getBackLinks().entrySet().stream().sorted(Comparator.comparingLong(Map.Entry::getKey))
+                .forEach(entry -> descriptionBuilder
+                .append(" - ")
+                .append(String.format(BACK_LINK_PATTERN, entry.getValue())));
         descriptionBuilder.append(DESCRIPTION_HEADING);
         Optional.ofNullable(additionalDescription)
                 .ifPresent(v -> {
