@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DescriptionService {
     private static final String DESCRIPTION_HEADING = "## Description:\n";
+    private static final String BACKLINK_HEADING = "## Back links to Report Portal:\n";
     private static final String COMMENTS_HEADING = "## Comments:\n";
     private static final String LOGS_HEADING = "## Logs:\n";
     private final TestItemRepository testItemRepository;
@@ -30,6 +31,10 @@ public class DescriptionService {
 
         TestItem testItem = testItemOptional.get();
         var descriptionBuilder = new StringBuilder();
+        descriptionBuilder.append(BACKLINK_HEADING);
+        ticketRQ.getBackLinks().forEach((id, link) -> {
+            descriptionBuilder.append(String.format("[Link to %s](%s)%n", id, link));
+        });
         descriptionBuilder.append(DESCRIPTION_HEADING);
         Optional.ofNullable(additionalDescription)
                 .ifPresent(v -> {

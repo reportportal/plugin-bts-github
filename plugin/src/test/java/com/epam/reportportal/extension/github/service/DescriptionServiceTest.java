@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -45,6 +46,7 @@ class DescriptionServiceTest {
         ticketRQ.setTestItemId(1L);
         ticketRQ.setIsIncludeComments(true);
         ticketRQ.setIsIncludeLogs(true);
+        ticketRQ.setBackLinks(Map.of(123L, "link"));
 
         TestItem testItem = getTestItem();
 
@@ -54,7 +56,9 @@ class DescriptionServiceTest {
 
         assertThat(descriptionString)
                 .isNotEmpty()
-                .contains("## Description:\n" +
+                .isEqualTo("## Back links to Report Portal:\n" +
+                        "[Link to 123](link)\n" +
+                        "## Description:\n" +
                         "additional\n" +
                         "Test description\n" +
                         "\n" +
@@ -65,8 +69,7 @@ class DescriptionServiceTest {
                         "Log message 2\n" +
                         "\n" +
                         "Log message 1\n" +
-                        "\n"
-                );
+                        "\n");
     }
 
     @Test
@@ -75,6 +78,7 @@ class DescriptionServiceTest {
         ticketRQ.setTestItemId(1L);
         ticketRQ.setIsIncludeComments(false);
         ticketRQ.setIsIncludeLogs(false);
+        ticketRQ.setBackLinks(Map.of(123L, "link"));
 
         var testItem = new TestItem();
         testItem.setDescription("Test description");
@@ -100,6 +104,7 @@ class DescriptionServiceTest {
         ticketRQ.setIsIncludeLogs(false);
         var testItem = new TestItem();
         testItem.setDescription("Test description");
+        ticketRQ.setBackLinks(Map.of(123L, "link"));
 
         // when
         when(testItemRepository.findById(anyLong())).thenReturn(Optional.of(testItem));
@@ -109,7 +114,7 @@ class DescriptionServiceTest {
         assertThat(descriptionString)
                 .isNotEmpty()
                 .contains("## Description:\n" +
-                          "Test description\n\n"
+                        "Test description\n\n"
                 );
     }
 
