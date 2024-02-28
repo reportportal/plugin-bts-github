@@ -57,7 +57,7 @@ class DescriptionServiceTest {
         assertThat(descriptionString)
                 .isNotEmpty()
                 .isEqualTo("## Back links to Report Portal:\n" +
-                        "[Link to 123](link)\n" +
+                        " - [Link to defect](link)\n" +
                         "## Description:\n" +
                         "additional\n" +
                         "Test description\n" +
@@ -116,6 +116,41 @@ class DescriptionServiceTest {
                 .contains("## Description:\n" +
                         "Test description\n\n"
                 );
+    }
+
+    @Test
+    void buildDescriptionString_shouldBuildDescription_withFewBacklinks() {
+        var ticketRQ = new PostTicketRQ();
+        ticketRQ.setTestItemId(1L);
+        ticketRQ.setIsIncludeComments(true);
+        ticketRQ.setIsIncludeLogs(true);
+        ticketRQ.setBackLinks(Map.of(
+                1L, "linkA",
+                2L, "linkB"));
+
+        TestItem testItem = getTestItem();
+
+        when(testItemRepository.findById(anyLong())).thenReturn(Optional.of(testItem));
+
+        String descriptionString = descriptionService.buildDescriptionString(ticketRQ, ADDITIONAL_DESCRIPTION);
+
+        assertThat(descriptionString)
+                .isNotEmpty()
+                .isEqualTo("## Back links to Report Portal:\n" +
+                           " - [Link to defect](linkA)\n" +
+                           " - [Link to defect](linkB)\n" +
+                           "## Description:\n" +
+                           "additional\n" +
+                           "Test description\n" +
+                           "\n" +
+                           "## Comments:\n" +
+                           "Test issue description\n" +
+                           "\n" +
+                           "## Logs:\n" +
+                           "Log message 2\n" +
+                           "\n" +
+                           "Log message 1\n" +
+                           "\n");
     }
 
     private static TestItem getTestItem() {
