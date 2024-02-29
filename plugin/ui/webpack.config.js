@@ -9,7 +9,7 @@ const pluginName = pjson.name;
 const config = {
   entry: path.resolve(__dirname, './src'),
   output: {
-    path: path.resolve(__dirname, 'build'),
+    path: path.resolve(__dirname, 'build/public'),
     filename: '[name].app.[contenthash:8].js',
     publicPath: 'auto',
     clean: true,
@@ -69,7 +69,7 @@ const config = {
       threads: true,
     }),
     new ModuleFederationPlugin({
-      name: 'plugin_name',
+      name: 'GitHub',
       filename: `remoteEntity.js`,
       shared: {
         react: {
@@ -109,7 +109,8 @@ const config = {
         },
       },
       exposes: {
-        './moduleName': './src/components/moduleName',
+        './integrationSettings': './src/components/integrationSettings',
+        './integrationFormFields': './src/components/integrationFormFields',
       },
     }),
     new CopyPlugin({

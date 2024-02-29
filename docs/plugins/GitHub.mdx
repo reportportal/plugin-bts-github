@@ -1,0 +1,246 @@
+---
+sidebar_position: 3
+sidebar_label: GitHub
+description: ReportPortal and GitHub integration streamlines testing, tracks issues and enhances collaboration for improved productivity.
+---
+
+# GitHub
+
+To install the GitHub plugin, see [Upload plugin](/plugins/ManagePlugins#upload-plugin) section.
+
+Integration with the GitHub can be required for projects that collect defects in a separate tracking tool. The integration provides an exchange of information between our centralized test automation tool and the GitHub, such as posting issues and linking issues, getting updates on their statuses.
+
+## Global GitHub integration
+
+### Obtaining GitHub integration configuration values
+
+#### Owner ID in BTS {#owner_id}
+Owner is a company/user that owns the repository (e.g., `reportportal`)
+<MediaViewer src={require('./img/github/OwnerExample.png')} alt="Owner value example" />
+
+#### Project ID in BTS {#project_id}
+Project is a name of the repository (e.g., `docs`)
+<MediaViewer src={require('./img/github/ProjectExample.png')} alt="Project value example" />
+
+#### Link to BTS {#link}
+This is a plain url to the repository (e.g., `https://github.com/reportportal/docs`)
+
+#### Getting GitHub Access Token {#access_token}
+Please refer to [Managing your personal access tokens in GitHub](https://docs.github.com/en/enterprise-server@3.9/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
+
+
+### Add new global GitHub
+
+If all projects on your instance are using the same GitHub projects, you will be able to configure **global integrations** which will be applied on all projects.
+
+1. Log in as ADMIN
+
+2. Go to Administrative > Plugins
+
+3. Click on GitHub plugin panel
+
+4. Click on "Add integration" button
+
+5. Fill and confirm the authorization form
+
+- `Integration Name`: the name which you want to give to your integration> - should be unique
+- `Link to BTS`: valid URL of a repository. [Getting link to BTS](#link)
+- `Project ID in BTS`: repository name. [Getting GitHub Project ID](#project_id)
+- `Owner ID in BTS`: owner of repository. [Getting GitHub Owner ID](#owner_id)
+- `Access Token`: GitHub access token. [Getting GitHub Access Token](#access_token)
+
+
+After you have created a connection with the GitHub project, you can choose predefined GitHub issue fields. These fields will be shown to you all the time when you post the issue in GitHub.
+
+This feature gives you the ability to choose which type you will post a ticket.
+
+To choose a needed issue type and predefined field for the chosen issue, you should perform the following actions:
+
+1. Click on "Configure" button
+
+2. Choose issue type from the drop-down
+
+3. Check the needed fields and fill them in if necessary
+
+4. Click on "Submit" button
+
+
+Now team members on all your projects will be able to submit issues in GitHub. Options for Post Issue / Link issue are activated.
+
+<MediaViewer src={require('./img/github/IntegrationCreation.png')} alt="Global GitHub Integration Creation" />
+
+You can add more integrations by clicking on "Add integration" button.
+
+### Update Global GitHub integration
+
+If you need to edit GitHub integration parameters, please perform actions:
+
+1. Log in as ADMIN
+
+2. Go to Administrative > Plugins
+
+3. Click on GitHub plugin panel
+
+4. Click on a tab with existing integration
+
+5. Click on "Edit"
+    <MediaViewer src={require('./img/github/EditIntegrationButton.png')} alt="Edit integration button" />
+
+6. Change needed parameters
+    <MediaViewer src={require('./img/github/EditGlobalIntegration.png')} alt="Edit global integration" />
+
+7. Submit the form
+
+If you need to edit fields which should be posted in GitHub, please perform actions:
+
+1. Log in as ADMIN
+
+2. Go to Administrative > Plugins
+
+3. Click on GitHub plugin panel
+
+4. Click on a tab with existing integration
+
+5. Click on "Configure" button
+
+6. Choose issue type from the drop-down
+
+7. Check the needed fields and fill them in if necessary
+
+8. Click on "Submit" button
+
+### Remove global GitHub integration
+
+If you need to remove GitHub integration, please perform actions:
+
+1. Log in as ADMIN
+
+2. Go to Administrative > Plugins
+
+3. Click on GitHub plugin panel
+
+4. Click on a tab with existing integration
+
+5. Click on "Remove integration"
+
+6. Submit the action
+
+## Project GitHub integration
+
+### Add new project  GitHub integration
+
+If any project needs different GitHub configurations, you should unlink a project from Global configurations and add a project configuration. It means that now when a new global integration is added to our test automation results dashboard, it won't be applied to the unlinked project.
+
+For that,
+
+1. Log in as an ADMIN or Project Manager
+
+2. Go to Project Settings > Integrations
+
+3. Click on the GitHub integration panel
+
+4. Click on "Add Project integration" button
+  :::note
+  Note that Global integrations will be unlinked if you create a Project Integration!
+  :::
+
+5. Fill and confirm the authorization form
+
+- `Integration Name`: the name which you want to give to your integration> - should be unique
+- `Link to BTS`: valid URL of a repository. [Getting link to BTS](#link)
+- `Project ID in BTS`: repository name. [Getting GitHub Project ID](#project_id)
+- `Owner ID in BTS`: owner of repository. [Getting GitHub Owner ID](#owner_id)
+- `Access Token`: GitHub access token. [Getting GitHub Access Token](#access_token)
+
+After you have created a connection with the GitHub project, you can choose predefined GitHub issue fields. These fields will be shown to you all the time when you post the issue in GitHub.
+
+This feature gives you the ability to choose which type you will post a ticket.
+
+To choose a needed issue type and predefined field for the chosen issue, you should perform the following actions:
+
+1. Click on "Configure" button
+
+2. Choose issue type from the drop-down
+
+3. Check the needed fields and fill them in if necessary
+
+4. Click on "Submit" button
+
+Now team members on **this project** will be able to submit issues in GitHub. Options for Post Issue / Link issue are activated.
+
+You can add more integrations by clicking on "Add integration" button.
+
+### Reset to Global GitHub Integrations
+
+If you want to delete project integrations with GitHub and link your project with global configurations, please perform actions described below:
+
+1. Log in as an ADMIN or Project Manager
+
+2. Go to Project Settings > Integrations
+
+3. Click on the GitHub integration panel
+
+4. Click on "Reset to Global Integrations" button
+    <MediaViewer src={require('./img/github/ResetToGlobalIntegrations.png')} alt="Reset to Global Integrations Button" />
+
+5. Confirm the action
+
+## Post issue to GitHub
+
+Posting an issue to GitHub means to create a new issue in GitHub from ReportPortal and upload logs and attachments from an execution.
+
+If you want to post a new issue to GitHub, you need to have a project or global integration with GitHub.
+
+<MediaViewer src={require('./img/github/PostIssue.png')} alt="Post Issue in GitHub in our test results dashboard" />
+
+Post issue via Step view
+
+1. Log in to ReportPortal as Admin, PM, Member, Customer or Operator
+
+2. Go to a Step view
+
+3. Choose a needed item
+
+4. Click on "Actions" button
+
+5. Choose "Post issue" option
+
+6. Fill in the "Post issue" form with valid data
+    - `BTS`: if you have configured BTS integrations, you will be able to choose between them
+    - `Integration name`: from the drop-down, you can choose any of integrations for chosen earlier BTS
+    - `Predefined fields`: fields which you choose on Project Settings/ or Plugins
+    - `Included data`: which data should be posted to BTS (attachments, logs, comments)
+
+7. Submit the form
+
+8. A new issue will be posted in BTS with information from ReportPortal
+
+9. A label with issue ID will be added to the test item
+
+## Link an issue with an issue in GitHub
+
+Linking an issue with an issue in GitHub means adding a clickable link to an existing issue in GitHub from ReportPortal that will show a status of this issue.
+
+<MediaViewer src={require('./img/github/LinkIssue.png')} alt="Link issue in Github" />
+
+Link issue via Step view
+
+1. Log in to ReportPortal as Admin, PM, Member, Customer or Operator
+
+2. Go to a Step view
+
+3. Choose a needed item
+
+4. Click on "Actions" button
+
+5. Choose "Link issue" option
+
+6. Fill in the "Link issue" form with valid data
+    - `BTS`: if you have configured BTS integrations, you will be able to choose between them
+    - `Integration name`: from the drop-down, you can choose any of integrations for chosen earlier BTS
+    - `Link to issue`: a full link to the item in BTS
+    - `Issue ID`: information which will be displayed on the label in ReportPortal
+
+7. Submit the form
+
+8. A label with issue ID will be added to the test item
